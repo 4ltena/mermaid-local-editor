@@ -145,7 +145,9 @@ const panzoom = new PanZoom(els.viewport, els.canvas, () => {
 });
 
 // ---------- rendering ----------
-let currentTheme = (localStorage.getItem(LS.theme) as MermaidTheme) || "default";
+let currentTheme =
+  (localStorage.getItem(LS.theme) as MermaidTheme) ||
+  (uiDark ? "dark" : "default");
 els.themeSelect.value = currentTheme;
 configureMermaid(currentTheme);
 
@@ -283,6 +285,14 @@ els.btnThemeUi.addEventListener("click", () => {
   localStorage.setItem(LS.ui, uiDark ? "dark" : "light");
   applyUiTheme(uiDark);
   editor.setDark(uiDark);
+  // Keep the diagram readable in dark mode: follow the UI theme so the mermaid
+  // edges/arrows and text stay visible. The テーマ dropdown can still override
+  // this manually until the next UI-theme toggle.
+  currentTheme = uiDark ? "dark" : "default";
+  els.themeSelect.value = currentTheme;
+  localStorage.setItem(LS.theme, currentTheme);
+  configureMermaid(currentTheme);
+  void render(editor.getValue(), false);
 });
 
 // ---------- split gutter resize ----------
