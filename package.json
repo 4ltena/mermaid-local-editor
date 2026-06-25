@@ -1,0 +1,28 @@
+{
+  "name": "mermaid-local-editor",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "A local, cross-platform Mermaid diagram editor (mermaid.live for the desktop) built with Tauri v2 + Vite.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build"
+  },
+  "dependencies": {
+    "@codemirror/commands": "^6.6.2",
+    "@codemirror/language": "^6.10.6",
+    "@codemirror/state": "^6.5.0",
+    "@codemirror/view": "^6.36.1",
+    "codemirror": "^6.0.1",
+    "mermaid": "^11.4.1"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.2.5",
+    "typescript": "^5.7.3",
+    "vite": "^6.0.7"
+  }
+}
