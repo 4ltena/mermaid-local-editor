@@ -2,7 +2,7 @@ import { session } from "electron";
 
 const CSP =
   "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; " +
-  "img-src 'self' data:; font-src 'self'; connect-src 'self'";
+  "img-src 'self' data:; font-src 'self'; connect-src 'self'; worker-src 'self'";
 
 /**
  * Apply the production CSP to every response. Not used in dev because the Vite
@@ -13,7 +13,7 @@ export function applyProductionCsp(): void {
     callback({
       responseHeaders: {
         ...details.responseHeaders,
-        "Content-Security-Policy": [CSP],
+        "content-security-policy": [CSP],
       },
     });
   });
