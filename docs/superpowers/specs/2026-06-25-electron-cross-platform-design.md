@@ -66,7 +66,7 @@
 - 自作スキーム **`app://`** を `protocol.registerSchemesAsPrivileged` で `{ standard:true, secure:true, supportFetchAPI:true, stream:true }` 登録し、ビルド済みレンダラ（`out/renderer`）を配信 → ESM・動的 import（mermaid の図種遅延ロード）・`fetch`・secure context（`navigator.clipboard` 可）が成立。`file://` は ESM/動的 import がブロックされるため不採用。
 - `BrowserWindow` webPreferences: **`contextIsolation: true` / `nodeIntegration: false` / `sandbox: true`**。
 - **CSP** をレスポンスヘッダ（または index.html の meta）で付与。初期値（mermaid 実態に合わせ調整）:
-  - `default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'`
+  - `default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; worker-src 'self'`
   - 注: mermaid/CodeMirror は実行時にインラインスタイルを多用するため `style-src 'unsafe-inline'` が必要。`script-src` は `'self'` のみ（インラインスクリプトなし）を維持。実装時に実際の描画で違反が出ないか検証し最小限に調整。
 - Tauri の `opener` プラグイン権限は撤廃 → 旧 HANDOFF が指摘した「CSP 無し + opener」hardening リグレッションを解消。
 

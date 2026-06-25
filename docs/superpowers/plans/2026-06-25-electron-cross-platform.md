@@ -15,7 +15,7 @@
 - Window: width 1280, height 800, minWidth 640, minHeight 480, resizable.
 - Node version: 24 (local + CI).
 - Security: `contextIsolation: true`, `nodeIntegration: false`, `sandbox: true`.
-- Production CSP: `default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'`.
+- Production CSP: `default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; worker-src 'self'`.
 - Accent color: light `#6366a8`, dark `#9a9de0`.
 - Linux distro mapping: Ubuntu=`deb`, AlmaLinux=`rpm`, Arch=`pacman`; `AppImage` as the universal fallback.
 - Release is tag-driven (`v*`) via GitHub Actions; version is the single source of truth in `package.json`.
@@ -465,7 +465,7 @@ import { session } from "electron";
 
 const CSP =
   "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; " +
-  "img-src 'self' data:; font-src 'self'; connect-src 'self'";
+  "img-src 'self' data:; font-src 'self'; connect-src 'self'; worker-src 'self'";
 
 /**
  * Apply the production CSP to every response. Not used in dev because the Vite
@@ -476,7 +476,7 @@ export function applyProductionCsp(): void {
     callback({
       responseHeaders: {
         ...details.responseHeaders,
-        "Content-Security-Policy": [CSP],
+        "content-security-policy": [CSP],
       },
     });
   });
