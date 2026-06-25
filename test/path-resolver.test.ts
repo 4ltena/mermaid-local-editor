@@ -24,4 +24,20 @@ describe("resolveRendererPath", () => {
   it("returns null for a traversal attempt", () => {
     expect(resolveRendererPath(root, "app://app/../../etc/passwd")).toBeNull();
   });
+
+  it("strips a query string", () => {
+    expect(resolveRendererPath(root, "app://app/index.html?foo=bar")).toBe(
+      join(root, "index.html"),
+    );
+  });
+
+  it("strips a fragment", () => {
+    expect(resolveRendererPath(root, "app://app/index.html#frag")).toBe(
+      join(root, "index.html"),
+    );
+  });
+
+  it("returns null for malformed percent-encoding", () => {
+    expect(resolveRendererPath(root, "app://app/%zz")).toBeNull();
+  });
 });
