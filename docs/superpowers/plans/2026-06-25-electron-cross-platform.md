@@ -74,7 +74,7 @@ rm -rf src-tauri/target out release   # ignore errors; build artifacts
     "codemirror": "^6.0.1",
     "electron": "^33.2.0",
     "electron-builder": "^25.1.8",
-    "electron-vite": "^2.3.0",
+    "electron-vite": "^5.0.0",
     "mermaid": "^11.4.1",
     "typescript": "^5.7.3",
     "vite": "^6.0.7",
