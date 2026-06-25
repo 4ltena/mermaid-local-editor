@@ -18,9 +18,21 @@ export function registerAppScheme(): void {
 /** Must be called after `app` is ready. */
 export function handleAppProtocol(): void {
   const rendererRoot = join(import.meta.dirname, "../renderer");
-  protocol.handle(APP_SCHEME, (request) => {
+  protocol.handle(APP_SCHEME, async (request) => {
     const filePath = resolveRendererPath(rendererRoot, request.url);
-    if (!filePath) return new Response("Not found", { status: 404 });
-    return net.fetch(pathToFileURL(filePath).toString());
+    if (!filePath) {
+      return new Response("Not found", {
+        status: 404,
+        headers: { "content-type": "text/plain" },
+      });
+    }
+    try {
+      return await net.fetch(pathToFileURL(filePath).toString());
+    } catch {
+      return new Response("Not found", {
+        status: 404,
+        headers: { "content-type": "text/plain" },
+      });
+    }
   });
 }

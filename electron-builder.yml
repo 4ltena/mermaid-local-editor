@@ -1,5 +1,6 @@
 appId: app.mermaid.localeditor
 productName: Mermaid Local Editor
+artifactName: ${name}-${version}-${arch}.${ext}
 directories:
   output: release
   buildResources: build
