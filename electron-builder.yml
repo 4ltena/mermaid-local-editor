@@ -1,0 +1,29 @@
+appId: app.mermaid.localeditor
+productName: Mermaid Local Editor
+directories:
+  output: release
+  buildResources: build
+files:
+  - out/**
+  - package.json
+publish:
+  provider: github
+mac:
+  identity: null
+  target:
+    - dmg
+    - zip
+  category: public.app-category.developer-tools
+  icon: build/icon.png
+win:
+  target:
+    - nsis
+  icon: build/icon.png
+linux:
+  target:
+    - AppImage
+    - deb
+    - rpm
+    - pacman
+  category: Development
+  icon: build/icon.png
