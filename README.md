@@ -28,7 +28,7 @@ npm run dist:win   # release/*.exe (nsis)           (run on Windows)
 npm run dist:linux # release/*.AppImage, *.deb, *.rpm, *.pacman (run on Linux)
 ```
 
-Native apps can only be built on their own OS. Use CI for cross-platform.
+Native apps can only be built on their own OS. Use the release workflow (.github/workflows/release.yml) for cross-platform packaging.
 
 ## Release (CI/CD)
 
