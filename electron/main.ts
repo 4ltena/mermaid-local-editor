@@ -2,6 +2,8 @@ import { join } from "node:path";
 import { app, BrowserWindow } from "electron";
 import { registerAppScheme, handleAppProtocol } from "./protocol";
 import { applyProductionCsp } from "./security";
+import { buildMenu } from "./menu";
+import { setupDownloads } from "./downloads";
 
 const isDev = !app.isPackaged;
 
@@ -34,6 +36,8 @@ function createWindow(): void {
 app.whenReady().then(() => {
   if (!isDev) applyProductionCsp();
   handleAppProtocol();
+  setupDownloads();
+  buildMenu(isDev);
   createWindow();
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
