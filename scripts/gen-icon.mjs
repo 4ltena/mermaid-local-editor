@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 const S = 1024;
 const buf = Buffer.alloc(S * S * 4); // RGBA
 
-const BG = [123, 63, 228]; // accent purple
+const BG = [99, 102, 168]; // muted indigo (#6366a8)
 const FG = [255, 255, 255];
 
 function set(x, y, [r, g, b], a = 255) {
@@ -122,7 +122,7 @@ const png = Buffer.concat([
 ]);
 
 const here = dirname(fileURLToPath(import.meta.url));
-const out = `${here}/../src-tauri/app-icon.png`;
+const out = `${here}/../build/icon.png`;
 mkdirSync(dirname(out), { recursive: true });
 writeFileSync(out, png);
 console.log("wrote", out, png.length, "bytes");
