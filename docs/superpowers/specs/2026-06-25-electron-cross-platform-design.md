@@ -31,7 +31,7 @@
 | 「コアを C 化」 | **不採用** | 描画コア = mermaid は JS 製で C 化は非現実的。シェルの C 化は3OS分の WebView/保存ダイアログ/配布を手書きとなり「保守を楽に」と矛盾 |
 | ビルドツール | レンダラ/メイン/preload を **electron-vite**、配布を **electron-builder** | 設定一元化と全形式パッケージ生成 |
 | 配色 | accent を **ミュートインディゴ**（light `#6366a8` / dark `#9a9de0`） | 紫のブランド連続性を保ちつつ彩度を抑える |
-| Win/Linux ビルド体制 | **GitHub Actions マトリクス** + ローカルは macOS のみ実ビルド | ネイティブ依存のため Mac 単独で全OSは作れない |
+| ビルド/リリース体制 | **GitHub Actions の CI/CD で全OSのネイティブアプリをビルドし、GitHub Releases へ自動リリース**。ローカルは macOS のみ実ビルド | ネイティブ依存のため Mac 単独で全OSは作れない。配布は CI/CD に一本化 |
 
 ## 4. アーキテクチャ
 
@@ -95,7 +95,7 @@
 - `electron.vite.config.ts`
 - `electron-builder.yml`
 - `build/`（アイコン: `icon.icns`(mac) / `icon.ico`(win) / `icon.png`(linux, 512px)）
-- `.github/workflows/build.yml`（CI マトリクス）
+- `.github/workflows/release.yml`（CI/CD リリース用マトリクス、タグ駆動で GitHub Releases へ自動公開）＋任意で `.github/workflows/ci.yml`（PR/push 時の型・ビルドチェック）
 
 ### 維持
 - `src/`・`index.html`・`tsconfig.json`。`vite.config.ts` の設定は `electron.vite.config.ts` の renderer セクションへ統合。
@@ -115,18 +115,22 @@
 
 - electron-builder は `pacman`/`rpm`/`deb`/`AppImage` をネイティブにサポート。Arch は将来 AUR（PKGBUILD）も追加余地。
 
-## 10. ビルド計画（本設計の中核）
+## 10. ビルド & リリース計画（本設計の中核）
 
-- **現実**: ネイティブ desktop アプリは Mac から Win/Linux を丸ごとビルドできない。標準解は CI マトリクス。
+- **現実**: ネイティブ desktop アプリは Mac から Win/Linux を丸ごとビルドできない。標準解は CI マトリクス。**配布は GitHub CI/CD に一本化**する。
 - **体制**:
-  1. **ローカル(この Mac)**: macOS 版を即ビルド＆実起動でテスト動作（Electron は npm 依存のみ、Rust/Xcode 不要）。
-  2. **GitHub Actions マトリクス**（`.github/workflows/build.yml`）:
-     - `macos-latest` → dmg/zip
-     - `windows-latest` → nsis
-     - `ubuntu-latest` → AppImage/deb/rpm/pacman
-     - タグ push（`v*`）時に Release へ artifact 添付。
-  3. **動作確認**: Ubuntu/Alma/Arch は AppImage が横断テスト最容易。ネイティブ pkg は Docker コンテナで install スモーク。Windows は VM/実機 or CI スモーク。
-- 署名は初期未対応（mac は Gatekeeper、win は SmartScreen の確認が出る前提。ローカル/配布初期は許容）。
+  1. **ローカル(この Mac)**: 開発と macOS 版の実ビルド＆実起動テストのみ（Electron は npm 依存のみ、Rust/Xcode 不要）。ローカルは検証用で、配布物の正は CI が生成する。
+  2. **CI/CD（GitHub Actions, `.github/workflows/release.yml`）でリリース**:
+     - **トリガ**: `v*` タグ push（例 `v0.1.0`）。手動 `workflow_dispatch` も用意。
+     - **マトリクス build ジョブ**:
+       - `macos-latest` → `dmg` + `zip`（arm64; 必要なら x64/universal も）
+       - `windows-latest` → `nsis`(.exe)
+       - `ubuntu-latest` → `AppImage` + `deb` + `rpm` + `pacman`
+     - **リリース手段**: 各ジョブで electron-builder を `--publish always`（`publish: github` プロバイダ）で実行し、生成物を **GitHub Releases（タグに対応）へ自動アップロード**。あるいは各ジョブで artifact 化 → 集約ジョブが `softprops/action-gh-release` で1つの Release にまとめて添付。いずれかを実装時に確定（既定は electron-builder の `--publish`）。
+     - **バージョン**: `package.json` の `version` を正とし、タグと一致させる（タグ駆動）。
+     - **権限**: `GITHUB_TOKEN`（`contents: write`）で Release 作成。追加シークレット不要（署名は当面なし）。
+  3. **CI 検証（任意の追加ジョブ）**: `electron-vite build` と `tsc --noEmit` を PR/push でも実行。Linux は AppImage を Docker(+xvfb) でヘッドレス起動スモーク可。
+- 署名は初期未対応（mac は Gatekeeper、win は SmartScreen の確認が出る前提。ローカル/配布初期は許容）。将来、証明書入手後に notarization/signing を同 CI に追加。
 
 ## 11. 配色変更
 
