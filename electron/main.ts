@@ -1,6 +1,7 @@
 import { join } from "node:path";
 import { app, BrowserWindow } from "electron";
 import { registerAppScheme, handleAppProtocol } from "./protocol";
+import { applyProductionCsp } from "./security";
 
 const isDev = !app.isPackaged;
 
@@ -31,6 +32,7 @@ function createWindow(): void {
 }
 
 app.whenReady().then(() => {
+  if (!isDev) applyProductionCsp();
   handleAppProtocol();
   createWindow();
   app.on("activate", () => {
