@@ -1,7 +1,10 @@
 import { join } from "node:path";
 import { app, BrowserWindow } from "electron";
+import { registerAppScheme, handleAppProtocol } from "./protocol";
 
 const isDev = !app.isPackaged;
+
+registerAppScheme();
 
 function createWindow(): void {
   const win = new BrowserWindow({
@@ -28,6 +31,7 @@ function createWindow(): void {
 }
 
 app.whenReady().then(() => {
+  handleAppProtocol();
   createWindow();
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
