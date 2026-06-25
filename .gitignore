@@ -2,10 +2,9 @@
 node_modules/
 
 # build output
+out/
+release/
 dist/
-
-# Tauri / Rust build
-src-tauri/target/
 
 # macOS
 .DS_Store

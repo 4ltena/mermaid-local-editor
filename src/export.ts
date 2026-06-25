@@ -1,5 +1,5 @@
 // File export helpers. Uses a Blob + anchor download, which works in a plain
-// browser, WebView2 (Tauri desktop) and mobile WebViews alike — no native
+// browser, the Electron renderer (Chromium) and mobile WebViews alike — no native
 // plugin required, keeping the cross-platform surface small.
 
 function triggerDownload(blob: Blob, filename: string): void {
