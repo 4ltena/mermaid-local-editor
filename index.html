@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ja">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -13,14 +13,14 @@
         </div>
         <div class="toolbar__group">
           <label class="field">
-            <span>サンプル</span>
-            <select id="sample-select" title="サンプルを読み込む">
-              <option value="">— 選択 —</option>
+            <span data-i18n="toolbar.sample">Sample</span>
+            <select id="sample-select" data-i18n-title="title.sampleSelect" title="Load a sample">
+              <option value="" data-i18n="sample.placeholder">— Select —</option>
             </select>
           </label>
           <label class="field">
-            <span>テーマ</span>
-            <select id="theme-select" title="Mermaid テーマ">
+            <span data-i18n="toolbar.theme">Theme</span>
+            <select id="theme-select" data-i18n-title="title.themeSelect" title="Mermaid theme">
               <option value="default">default</option>
               <option value="dark">dark</option>
               <option value="forest">forest</option>
@@ -29,15 +29,15 @@
           </label>
         </div>
         <div class="toolbar__group">
-          <button id="btn-zoom-out" title="縮小">－</button>
-          <button id="btn-zoom-reset" title="表示をリセット">100%</button>
-          <button id="btn-zoom-in" title="拡大">＋</button>
+          <button id="btn-zoom-out" data-i18n-title="title.zoomOut" title="Zoom out">－</button>
+          <button id="btn-zoom-reset" data-i18n-title="title.zoomReset" title="Reset view">100%</button>
+          <button id="btn-zoom-in" data-i18n-title="title.zoomIn" title="Zoom in">＋</button>
         </div>
         <div class="toolbar__group toolbar__group--right">
-          <button id="btn-copy" title="コードをコピー">コピー</button>
-          <button id="btn-export-svg" title="SVG を保存">SVG</button>
-          <button id="btn-export-png" title="PNG を保存">PNG</button>
-          <button id="btn-theme-ui" title="画面の明暗を切替">🌙</button>
+          <button id="btn-copy" data-i18n-title="title.copy" title="Copy code"><span data-i18n="btn.copy">Copy</span></button>
+          <button id="btn-export-svg" data-i18n-title="title.svg" title="Save SVG">SVG</button>
+          <button id="btn-export-png" data-i18n-title="title.png" title="Save PNG">PNG</button>
+          <button id="btn-theme-ui" data-i18n-title="title.themeUi" title="Toggle light/dark">🌙</button>
         </div>
       </header>
 
@@ -45,7 +45,7 @@
         <section class="pane pane--editor">
           <div id="editor" class="editor"></div>
         </section>
-        <div class="gutter" id="gutter" title="ドラッグで幅を調整"></div>
+        <div class="gutter" id="gutter" data-i18n-title="title.gutter" title="Drag to resize"></div>
         <section class="pane pane--preview">
           <div class="preview-viewport" id="preview-viewport">
             <div class="preview-canvas" id="preview-canvas"></div>
@@ -55,7 +55,7 @@
       </main>
 
       <footer class="statusbar">
-        <span id="status-text">準備完了</span>
+        <span id="status-text">Ready</span>
       </footer>
     </div>
     <script type="module" src="/src/main.ts"></script>
