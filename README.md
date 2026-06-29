@@ -27,9 +27,9 @@ A fully local, cross-platform Mermaid diagram editor.
 - **ライブプレビュー** — CodeMirror エディタに入力すると、デバウンス付きで即座に再描画。構文エラーはパネル表示し、直前の正常な図は保持。
 - **ダーク/ライト対応** — UI のダーク切替に図のテーマが連動し、ダーク時は矢印・文字が見える mermaid の `dark` テーマへ自動切替（`default`/`dark`/`forest`/`neutral` の手動選択も可）。
 - **パン & ズーム** — ホイールズーム、ドラッグでパン、フィット表示。
-- **エクスポート** — SVG / PNG を保存ダイアログで書き出し。コードのクリップボードコピーにも対応。
+- **エクスポート** — Export ダイアログから SVG / PNG / WebP を書き出し（サイズは auto 倍率または custom px×px、縦横比固定）。コードのクリップボードコピーにも対応。
 - **サンプル & 永続化** — 代表的な図種のサンプルを同梱。コード・テーマ・分割幅は `localStorage` に自動保存。
-- **多言語UI** — 英語・日本語に対応。ヘッダーの `JA | EN` トグルで切替（初回は OS の言語に追従し、選択は保存）。
+- **多言語UI** — 11言語（英語/日本語/繁体中文/简体中文/한국어/Français/Español/Deutsch/Português/Italiano/Русский）。ヘッダーのプルダウンで切替（初回は OS の言語に追従し、選択は保存）。
 - **完全ローカル / オフライン** — mermaid・CodeMirror をバンドル。外部 CDN・fetch・トラッキングなし。
 - **ハードニング** — 本番ビルドは厳格な CSP、`contextIsolation` / `sandbox` 有効、独自 `app://` プロトコルで配信。
 
@@ -86,9 +86,9 @@ A Mermaid editing app that runs **fully local and offline**. Built with Electron
 - **Live preview** — debounced re-render as you type in the CodeMirror editor; syntax errors show in a panel while the last valid diagram is kept.
 - **Dark / light aware** — the diagram theme follows the UI theme, switching to mermaid's `dark` theme (visible arrows/text) in dark mode (`default`/`dark`/`forest`/`neutral` can also be chosen manually).
 - **Pan & zoom** — wheel zoom, drag to pan, fit-to-view.
-- **Export** — save SVG / PNG via a save dialog; copy the source to the clipboard.
+- **Export** — export SVG / PNG / WebP from the Export dialog (auto scale or custom px×px with aspect lock); copy the source to the clipboard too.
 - **Samples & persistence** — bundled samples for common diagram types; code, theme, and split width are auto-saved to `localStorage`.
-- **Bilingual UI** — English and Japanese, switched via the `JA | EN` toggle in the header (initial language follows the OS; the choice is saved).
+- **Multilingual UI** — 11 languages (English / 日本語 / 繁體中文 / 简体中文 / 한국어 / Français / Español / Deutsch / Português / Italiano / Русский), switched via the header dropdown (initial language follows the OS; the choice is saved).
 - **Fully local / offline** — mermaid and CodeMirror are bundled; no external CDN, fetch, or tracking.
 - **Hardened** — strict CSP in production builds, `contextIsolation` / `sandbox` enabled, served over a custom `app://` protocol.
 
