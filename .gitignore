@@ -12,5 +12,6 @@ dist/
 # SDD scratch (subagent-driven-development ledger/briefs/reports)
 .superpowers/
 
-# Conversation handoff memo (local, per project convention)
+# Claude-local working docs (instructions / handoff memo; not for the repo)
+CLAUDE.md
 HANDOFF.md
