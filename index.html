@@ -35,13 +35,13 @@
         </div>
         <div class="toolbar__group toolbar__group--right">
           <button id="btn-copy" data-i18n-title="title.copy" title="Copy code"><span data-i18n="btn.copy">Copy</span></button>
-          <button id="btn-export-svg" data-i18n-title="title.svg" title="Save SVG">SVG</button>
-          <button id="btn-export-png" data-i18n-title="title.png" title="Save PNG">PNG</button>
-          <button id="btn-lang" class="lang-toggle" data-i18n-title="title.lang" title="Switch language">
-            <span class="lang-seg" data-locale="ja">JA</span>
-            <span class="lang-sep">|</span>
-            <span class="lang-seg" data-locale="en">EN</span>
-          </button>
+          <button id="btn-export" data-i18n-title="title.export" title="Export the diagram"><span data-i18n="btn.export">Export</span></button>
+          <div class="lang-dd">
+            <button id="btn-lang" class="lang-trigger" data-i18n-title="title.lang" title="Language" aria-haspopup="listbox" aria-expanded="false">
+              <span class="lang-code">EN</span><span class="lang-caret">▾</span>
+            </button>
+            <ul id="lang-menu" class="lang-menu" role="listbox" hidden></ul>
+          </div>
           <button id="btn-theme-ui" data-i18n-title="title.themeUi" title="Toggle light/dark">🌙</button>
         </div>
       </header>
@@ -62,6 +62,47 @@
       <footer class="statusbar">
         <span id="status-text">Ready</span>
       </footer>
+    </div>
+    <div id="export-dialog" class="modal" hidden>
+      <div class="modal__backdrop" data-close></div>
+      <div class="modal__panel" role="dialog" aria-modal="true" aria-labelledby="exp-title">
+        <h2 id="exp-title" data-i18n="export.title">Export</h2>
+
+        <div class="exp-row">
+          <span class="exp-label" data-i18n="export.format">Format</span>
+          <label><input type="radio" name="exp-format" id="exp-format-svg" value="svg" checked /> SVG</label>
+          <label><input type="radio" name="exp-format" value="png" /> PNG</label>
+          <label><input type="radio" name="exp-format" value="webp" /> WebP</label>
+        </div>
+
+        <div class="exp-row">
+          <span class="exp-label" data-i18n="export.size">Size</span>
+          <label><input type="radio" name="exp-size" id="exp-size-auto" value="auto" checked /> <span data-i18n="export.auto">auto</span></label>
+          <label><input type="radio" name="exp-size" id="exp-size-custom" value="custom" /> <span data-i18n="export.custom">custom</span></label>
+        </div>
+
+        <div class="exp-row" id="exp-scale-row">
+          <span class="exp-label" data-i18n="export.scale">Scale</span>
+          <label><input type="radio" name="exp-scale" value="1" /> 1×</label>
+          <label><input type="radio" name="exp-scale" value="2" checked /> 2×</label>
+          <label><input type="radio" name="exp-scale" value="3" /> 3×</label>
+          <label><input type="radio" name="exp-scale" value="n" /> <input type="number" id="exp-scale-n" min="1" max="10" step="1" value="2" class="exp-num exp-num--scale" /> ×</label>
+        </div>
+
+        <div class="exp-row" id="exp-custom-row" hidden>
+          <input type="number" id="exp-w" min="1" class="exp-num" /> px
+          <span class="exp-x">×</span>
+          <input type="number" id="exp-h" min="1" class="exp-num" /> px
+          <button id="exp-lock" class="exp-lock is-locked" type="button" data-i18n-title="export.lock" title="Lock aspect ratio" aria-pressed="true">
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M9.5 8.5a3.5 3.5 0 0 1 5 0l1 1a3.5 3.5 0 0 1 0 5M14.5 15.5a3.5 3.5 0 0 1-5 0l-1-1a3.5 3.5 0 0 1 0-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+
+        <div class="exp-actions">
+          <button id="exp-cancel" type="button" data-close data-i18n="export.cancel">Cancel</button>
+          <button id="exp-run" type="button" class="exp-run" data-i18n="export.run">Export</button>
+        </div>
+      </div>
     </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
