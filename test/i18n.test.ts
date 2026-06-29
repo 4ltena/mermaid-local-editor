@@ -6,10 +6,13 @@ describe("translate", () => {
     expect(translate("en", "export.run")).toBe("Export");
     expect(translate("ja", "export.run")).toBe("書き出す");
   });
-  it("falls back en -> key", () => {
+  it("falls back to en then the key for a missing entry", () => {
     expect(translate("en", "no.such.key")).toBe("no.such.key");
-    // a locale with no dict entry yet falls back to en
-    expect(translate("fr", "export.run")).toBe(translate("en", "export.run"));
+    expect(translate("fr", "no.such.key")).toBe("no.such.key");
+  });
+  it("uses each locale's own translation when present", () => {
+    expect(translate("fr", "export.run")).toBe("Exporter");
+    expect(translate("ko", "status.exported")).toBe("내보냈습니다");
   });
 });
 

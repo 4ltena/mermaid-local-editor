@@ -9,7 +9,19 @@ export interface Sample {
 export const SAMPLES: Sample[] = [
   {
     id: "flowchart",
-    label: { en: "Flowchart (login)", ja: "フローチャート（ログイン）" },
+    label: {
+      en: "Flowchart (login)",
+      ja: "フローチャート（ログイン）",
+      "zh-TW": "流程圖（登入）",
+      "zh-CN": "流程图（登录）",
+      "ko": "플로차트 (로그인)",
+      "fr": "Organigramme (connexion)",
+      "es": "Diagrama de flujo (inicio de sesión)",
+      "de": "Flussdiagramm (Anmeldung)",
+      "pt": "Fluxograma (login)",
+      "it": "Diagramma di flusso (login)",
+      "ru": "Блок-схема (вход)",
+    },
     code: `flowchart TD
     A["ユーザーがIDとパスワードを入力"] --> B{"認証情報をDBに照会"}
     B -->|"成功"| C["ホーム画面へ遷移"]
@@ -18,7 +30,19 @@ export const SAMPLES: Sample[] = [
   },
   {
     id: "sequence",
-    label: { en: "Sequence", ja: "シーケンス図" },
+    label: {
+      en: "Sequence",
+      ja: "シーケンス図",
+      "zh-TW": "循序圖",
+      "zh-CN": "时序图",
+      "ko": "시퀀스",
+      "fr": "Séquence",
+      "es": "Secuencia",
+      "de": "Sequenz",
+      "pt": "Sequência",
+      "it": "Sequenza",
+      "ru": "Последовательность",
+    },
     code: `sequenceDiagram
     participant U as ユーザー
     participant S as システム
@@ -34,7 +58,19 @@ export const SAMPLES: Sample[] = [
   },
   {
     id: "class",
-    label: { en: "Class", ja: "クラス図" },
+    label: {
+      en: "Class",
+      ja: "クラス図",
+      "zh-TW": "類別圖",
+      "zh-CN": "类图",
+      "ko": "클래스",
+      "fr": "Classe",
+      "es": "Clases",
+      "de": "Klasse",
+      "pt": "Classe",
+      "it": "Classe",
+      "ru": "Класс",
+    },
     code: `classDiagram
     class User {
       +String name
@@ -51,7 +87,19 @@ export const SAMPLES: Sample[] = [
   },
   {
     id: "state",
-    label: { en: "State", ja: "状態遷移図" },
+    label: {
+      en: "State",
+      ja: "状態遷移図",
+      "zh-TW": "狀態圖",
+      "zh-CN": "状态图",
+      "ko": "상태",
+      "fr": "État",
+      "es": "Estados",
+      "de": "Zustand",
+      "pt": "Estado",
+      "it": "Stato",
+      "ru": "Состояние",
+    },
     code: `stateDiagram-v2
     [*] --> 待機
     待機 --> 処理中 : 開始
@@ -62,7 +110,19 @@ export const SAMPLES: Sample[] = [
   },
   {
     id: "gantt",
-    label: { en: "Gantt", ja: "ガントチャート" },
+    label: {
+      en: "Gantt",
+      ja: "ガントチャート",
+      "zh-TW": "甘特圖",
+      "zh-CN": "甘特图",
+      "ko": "간트",
+      "fr": "Gantt",
+      "es": "Gantt",
+      "de": "Gantt",
+      "pt": "Gantt",
+      "it": "Gantt",
+      "ru": "Диаграмма Ганта",
+    },
     code: `gantt
     title プロジェクト計画
     dateFormat YYYY-MM-DD
@@ -75,7 +135,19 @@ export const SAMPLES: Sample[] = [
   },
   {
     id: "pie",
-    label: { en: "Pie", ja: "円グラフ" },
+    label: {
+      en: "Pie",
+      ja: "円グラフ",
+      "zh-TW": "圓餅圖",
+      "zh-CN": "饼图",
+      "ko": "파이",
+      "fr": "Camembert",
+      "es": "Circular",
+      "de": "Kreis",
+      "pt": "Pizza",
+      "it": "Torta",
+      "ru": "Круговая",
+    },
     code: `pie title 利用ブラウザ
     "Chrome" : 62
     "Safari" : 18
@@ -84,7 +156,19 @@ export const SAMPLES: Sample[] = [
   },
   {
     id: "er",
-    label: { en: "ER", ja: "ER図" },
+    label: {
+      en: "ER",
+      ja: "ER図",
+      "zh-TW": "實體關係圖",
+      "zh-CN": "ER 图",
+      "ko": "ER",
+      "fr": "ER",
+      "es": "ER",
+      "de": "ER",
+      "pt": "ER",
+      "it": "ER",
+      "ru": "ER",
+    },
     code: `erDiagram
     CUSTOMER ||--o{ ORDER : places
     ORDER ||--|{ LINE_ITEM : contains
@@ -99,7 +183,19 @@ export const SAMPLES: Sample[] = [
   },
   {
     id: "mindmap",
-    label: { en: "Mindmap", ja: "マインドマップ" },
+    label: {
+      en: "Mindmap",
+      ja: "マインドマップ",
+      "zh-TW": "心智圖",
+      "zh-CN": "思维导图",
+      "ko": "마인드맵",
+      "fr": "Carte mentale",
+      "es": "Mapa mental",
+      "de": "Mindmap",
+      "pt": "Mapa mental",
+      "it": "Mappa mentale",
+      "ru": "Интеллект-карта",
+    },
     code: `mindmap
   root((Mermaid))
     描画
