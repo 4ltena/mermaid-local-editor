@@ -8,6 +8,7 @@ import {
 } from "./mermaid-render";
 import { exportSvg, exportPng } from "./export";
 import { SAMPLES, DEFAULT_CODE } from "./samples";
+import { getLocale } from "./i18n";
 
 // ---------- persisted state ----------
 const LS = {
@@ -213,7 +214,7 @@ const editor = new CodeEditor({
 for (const s of SAMPLES) {
   const opt = document.createElement("option");
   opt.value = s.id;
-  opt.textContent = s.label;
+  opt.textContent = s.label[getLocale()];
   els.sampleSelect.appendChild(opt);
 }
 els.sampleSelect.addEventListener("change", () => {
