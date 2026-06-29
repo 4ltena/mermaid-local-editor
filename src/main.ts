@@ -8,7 +8,8 @@ import {
 } from "./mermaid-render";
 import { exportDiagram, lockedCounterpart } from "./export";
 import { SAMPLES, DEFAULT_CODE } from "./samples";
-import { detectInitialLocale, applyDom, getLocale, setLocale, t } from "./i18n";
+import { detectInitialLocale, applyDom, getLocale, setLocale, t, LOCALES } from "./i18n";
+import type { Locale } from "./i18n";
 
 // ---------- persisted state ----------
 const LS = {
@@ -256,7 +257,7 @@ els.sampleSelect.addEventListener("change", () => {
   // currently loaded (do not reset it back to the "— 選択 —" placeholder).
 });
 
-// ---------- language toggle ----------
+// ---------- language dropdown ----------
 function relabelSamples(): void {
   for (const opt of Array.from(els.sampleSelect.options)) {
     const s = SAMPLES.find((x) => x.id === opt.value);
@@ -265,19 +266,52 @@ function relabelSamples(): void {
 }
 
 function updateLangButton(): void {
-  const loc = getLocale();
-  els.btnLang.querySelectorAll<HTMLElement>(".lang-seg").forEach((seg) => {
-    seg.classList.toggle("is-active", seg.dataset.locale === loc);
-  });
+  const cur = LOCALES.find((l) => l.code === getLocale());
+  const codeEl = els.btnLang.querySelector<HTMLElement>(".lang-code");
+  if (codeEl && cur) codeEl.textContent = cur.short;
 }
+
+function openLangMenu(): void {
+  els.langMenu.hidden = false;
+  els.btnLang.setAttribute("aria-expanded", "true");
+}
+function closeLangMenu(): void {
+  els.langMenu.hidden = true;
+  els.btnLang.setAttribute("aria-expanded", "false");
+}
+
+function buildLangMenu(): void {
+  els.langMenu.replaceChildren();
+  for (const l of LOCALES) {
+    const li = document.createElement("li");
+    li.className = "lang-item";
+    li.setAttribute("role", "option");
+    li.dataset.locale = l.code;
+    li.textContent = `${l.short} ${l.name}`;
+    li.addEventListener("click", () => {
+      setLocale(l.code as Locale);
+      relabelSamples();
+      updateLangButton();
+      if (lastStatusKey) els.status.textContent = t(lastStatusKey);
+      closeLangMenu();
+    });
+    els.langMenu.appendChild(li);
+  }
+}
+
+buildLangMenu();
 updateLangButton();
 
-els.btnLang.addEventListener("click", () => {
-  setLocale(getLocale() === "ja" ? "en" : "ja");
-  relabelSamples();
-  updateLangButton();
-  if (lastStatusKey) els.status.textContent = t(lastStatusKey);
+els.btnLang.addEventListener("click", (e) => {
+  e.stopPropagation();
+  if (els.langMenu.hidden) openLangMenu();
+  else closeLangMenu();
 });
+window.addEventListener("click", () => closeLangMenu());
+window.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeLangMenu();
+});
+els.langMenu.addEventListener("click", (e) => e.stopPropagation());
 
 // ---------- theme select ----------
 els.themeSelect.addEventListener("change", () => {
