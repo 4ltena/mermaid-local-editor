@@ -226,6 +226,44 @@ button:active {
   color: var(--text-soft);
   cursor: not-allowed;
 }
+
+/* editor copy button (top-right of the editor pane, appears on hover) */
+.editor-copy {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 5;
+  padding: 5px;
+  display: inline-flex;
+  color: var(--text-soft);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+.pane--editor:hover .editor-copy,
+.editor-copy:focus-visible {
+  opacity: 0.85;
+}
+.editor-copy:hover {
+  opacity: 1;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.editor-copy .icon-check {
+  display: none;
+}
+.editor-copy.is-copied {
+  opacity: 1;
+}
+.editor-copy.is-copied .icon-copy {
+  display: none;
+}
+.editor-copy.is-copied .icon-check {
+  display: inline;
+  color: #2e9e5b;
+}
 .exp-x {
   color: var(--text-soft);
 }

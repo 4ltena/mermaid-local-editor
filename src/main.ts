@@ -39,7 +39,7 @@ const els = {
   btnZoomIn: $("btn-zoom-in"),
   btnZoomOut: $("btn-zoom-out"),
   btnZoomReset: $("btn-zoom-reset"),
-  btnCopy: $("btn-copy"),
+  editorCopy: $<HTMLButtonElement>("editor-copy"),
   btnExport: $("btn-export"),
   expDialog: $<HTMLDivElement>("export-dialog"),
   expCustomRow: $<HTMLDivElement>("exp-custom-row"),
@@ -339,10 +339,11 @@ els.btnZoomReset.addEventListener("click", () => {
   else panzoom.reset();
 });
 
-els.btnCopy.addEventListener("click", async () => {
+els.editorCopy.addEventListener("click", async () => {
   try {
     await navigator.clipboard.writeText(editor.getValue());
-    setStatus("status.copied");
+    els.editorCopy.classList.add("is-copied");
+    window.setTimeout(() => els.editorCopy.classList.remove("is-copied"), 1500);
   } catch {
     setStatus("status.copyFailed");
   }
