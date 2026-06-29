@@ -7,8 +7,6 @@ directories:
 files:
   - out/**
   - package.json
-publish:
-  provider: github
 mac:
   identity: null
   target:
