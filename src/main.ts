@@ -223,7 +223,8 @@ els.sampleSelect.addEventListener("change", () => {
     void render(s.code, true);
     localStorage.setItem(LS.code, s.code);
   }
-  els.sampleSelect.value = "";
+  // Leave the chosen option selected so the dropdown reflects which sample is
+  // currently loaded (do not reset it back to the "— 選択 —" placeholder).
 });
 
 // ---------- theme select ----------
