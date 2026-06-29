@@ -3,6 +3,34 @@
 [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/) 形式に概ね従い、[セマンティックバージョニング](https://semver.org/lang/ja/) を採用しています。
 This file roughly follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and uses [Semantic Versioning](https://semver.org/).
 
+## [0.3.0] — 2026-06-29
+
+エディタの挙動調整と、CI の供給網ハードニング。
+
+### 変更
+- UI 明暗トグルでの図テーマ自動連動を `default` ↔ `dark` のペアに限定。forest/neutral 等の明示選択は維持し、対象外では図を再描画しない。
+- コードを手編集するとサンプル選択を「— 選択 —」へ戻す（同一サンプルの再読込も可能に）。
+- 言語切替時に、表示中のステータス文言も新しい言語へ即時切替する。
+
+### セキュリティ
+- GitHub Actions を commit SHA でピン留めし、Dependabot（github-actions, weekly）で更新を追従する。
+
+### 検証
+- 型検査・ユニットテスト（11件）・本番ビルドがすべて成功。
+
+Editor behavior tweaks and CI supply-chain hardening.
+
+### Changed
+- The UI light/dark toggle only swaps the paired `default` ↔ `dark` diagram themes; an explicit forest/neutral/etc. choice is preserved, and the diagram is not re-rendered when nothing changes.
+- Editing the code resets the sample dropdown to "— Select —" (and lets you reload the same sample).
+- Switching the language now also re-translates the currently shown status message.
+
+### Security
+- GitHub Actions are pinned to commit SHAs, with Dependabot (github-actions, weekly) tracking updates.
+
+### Verified
+- Type-check, unit tests (11), and the production build all pass.
+
 ## [0.2.0] — 2026-06-29
 
 エディタの英語・日本語対応と、配布物（macOS universal / Windows arm64）の拡充。

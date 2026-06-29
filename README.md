@@ -53,7 +53,7 @@ npm run build      # electron-vite build -> out/
 ### パッケージ作成（各OS）
 ネイティブアプリは**それぞれのOS上**でのみビルドできます。
 ```bash
-npm run dist:mac   # release/*.dmg, *.zip, *.app   （macOS で実行）
+npm run dist:mac   # release/*-universal.dmg, *.zip（macOS で実行・Apple Silicon + Intel）
 npm run dist:win   # release/*.exe (nsis)           （Windows で実行）
 npm run dist:linux # release/*.AppImage, *.deb, *.rpm, *.pacman （Linux で実行）
 ```
@@ -112,7 +112,7 @@ npm run build      # electron-vite build -> out/
 ### Packaging (per OS)
 Native apps can only be built on their own OS.
 ```bash
-npm run dist:mac   # release/*.dmg, *.zip, *.app   (run on macOS)
+npm run dist:mac   # release/*-universal.dmg, *.zip   (run on macOS; Apple Silicon + Intel)
 npm run dist:win   # release/*.exe (nsis)           (run on Windows)
 npm run dist:linux # release/*.AppImage, *.deb, *.rpm, *.pacman (run on Linux)
 ```
