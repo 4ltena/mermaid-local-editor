@@ -37,7 +37,28 @@ app.whenReady().then(() => {
   if (!isDev) applyProductionCsp();
   handleAppProtocol();
   setupDownloads();
-  const menuLocale = /^ja/i.test(app.getLocale()) ? "ja" : "en";
+  const ol = app.getLocale().toLowerCase();
+  const menuLocale = ol.startsWith("zh")
+    ? /tw|hant|hk|mo/.test(ol)
+      ? "zh-TW"
+      : "zh-CN"
+    : ol.startsWith("ja")
+      ? "ja"
+      : ol.startsWith("ko")
+        ? "ko"
+        : ol.startsWith("fr")
+          ? "fr"
+          : ol.startsWith("es")
+            ? "es"
+            : ol.startsWith("de")
+              ? "de"
+              : ol.startsWith("pt")
+                ? "pt"
+                : ol.startsWith("it")
+                  ? "it"
+                  : ol.startsWith("ru")
+                    ? "ru"
+                    : "en";
   buildMenu(isDev, menuLocale);
   createWindow();
   app.on("activate", () => {
