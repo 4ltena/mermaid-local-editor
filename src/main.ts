@@ -266,9 +266,13 @@ function relabelSamples(): void {
 }
 
 function updateLangButton(): void {
-  const cur = LOCALES.find((l) => l.code === getLocale());
+  const loc = getLocale();
+  const cur = LOCALES.find((l) => l.code === loc);
   const codeEl = els.btnLang.querySelector<HTMLElement>(".lang-code");
   if (codeEl && cur) codeEl.textContent = cur.short;
+  els.langMenu.querySelectorAll<HTMLElement>(".lang-item").forEach((li) => {
+    li.setAttribute("aria-selected", String(li.dataset.locale === loc));
+  });
 }
 
 function openLangMenu(): void {
@@ -425,7 +429,13 @@ els.expDialog
       expFillCustomFromAuto();
     }),
   );
-els.expScaleN.addEventListener("input", expFillCustomFromAuto);
+els.expScaleN.addEventListener("input", () => {
+  // Editing the n× field implies the n× preset, even if the radio wasn't clicked
+  // (clicking the nested number input does not activate the label's radio).
+  const nRadio = els.expDialog.querySelector<HTMLInputElement>('input[name="exp-scale"][value="n"]');
+  if (nRadio) nRadio.checked = true;
+  expFillCustomFromAuto();
+});
 
 els.expLock.addEventListener("click", () => {
   const locked = !expLocked();

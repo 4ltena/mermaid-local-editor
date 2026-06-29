@@ -87,7 +87,7 @@ export async function exportDiagram(
         resolve();
       },
       mime,
-      opts.quality ?? 0.92,
+      opts.format === "webp" ? (opts.quality ?? 0.92) : undefined,
     );
   });
 }
