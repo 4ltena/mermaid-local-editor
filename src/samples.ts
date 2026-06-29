@@ -1,6 +1,8 @@
+import type { Locale } from "./i18n";
+
 export interface Sample {
   id: string;
-  label: { en: string; ja: string };
+  label: Partial<Record<Locale, string>> & { en: string };
   code: string;
 }
 

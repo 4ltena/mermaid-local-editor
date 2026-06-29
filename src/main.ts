@@ -232,7 +232,7 @@ const editor = new CodeEditor({
 for (const s of SAMPLES) {
   const opt = document.createElement("option");
   opt.value = s.id;
-  opt.textContent = s.label[getLocale()];
+  opt.textContent = s.label[getLocale()] ?? s.label.en;
   els.sampleSelect.appendChild(opt);
 }
 els.sampleSelect.addEventListener("change", () => {
@@ -252,7 +252,7 @@ els.sampleSelect.addEventListener("change", () => {
 function relabelSamples(): void {
   for (const opt of Array.from(els.sampleSelect.options)) {
     const s = SAMPLES.find((x) => x.id === opt.value);
-    if (s) opt.textContent = s.label[getLocale()];
+    if (s) opt.textContent = s.label[getLocale()] ?? s.label.en;
   }
 }
 
