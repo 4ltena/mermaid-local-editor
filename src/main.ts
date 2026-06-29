@@ -8,7 +8,7 @@ import {
 } from "./mermaid-render";
 import { exportSvg, exportPng } from "./export";
 import { SAMPLES, DEFAULT_CODE } from "./samples";
-import { detectInitialLocale, applyDom, getLocale, t } from "./i18n";
+import { detectInitialLocale, applyDom, getLocale, setLocale, t } from "./i18n";
 
 // ---------- persisted state ----------
 const LS = {
@@ -42,6 +42,7 @@ const els = {
   btnSvg: $("btn-export-svg"),
   btnPng: $("btn-export-png"),
   btnThemeUi: $("btn-theme-ui"),
+  btnLang: $("btn-lang"),
 };
 
 // ---------- i18n ----------
@@ -231,6 +232,28 @@ els.sampleSelect.addEventListener("change", () => {
   }
   // Leave the chosen option selected so the dropdown reflects which sample is
   // currently loaded (do not reset it back to the "— 選択 —" placeholder).
+});
+
+// ---------- language toggle ----------
+function relabelSamples(): void {
+  for (const opt of Array.from(els.sampleSelect.options)) {
+    const s = SAMPLES.find((x) => x.id === opt.value);
+    if (s) opt.textContent = s.label[getLocale()];
+  }
+}
+
+function updateLangButton(): void {
+  const loc = getLocale();
+  els.btnLang.querySelectorAll<HTMLElement>(".lang-seg").forEach((seg) => {
+    seg.classList.toggle("is-active", seg.dataset.locale === loc);
+  });
+}
+updateLangButton();
+
+els.btnLang.addEventListener("click", () => {
+  setLocale(getLocale() === "ja" ? "en" : "ja");
+  relabelSamples();
+  updateLangButton();
 });
 
 // ---------- theme select ----------

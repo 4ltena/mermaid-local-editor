@@ -122,6 +122,23 @@ button:active {
   border-color: var(--accent);
 }
 
+.lang-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.lang-toggle .lang-seg {
+  opacity: 0.5;
+}
+.lang-toggle .lang-seg.is-active {
+  opacity: 1;
+  font-weight: 600;
+  color: var(--accent);
+}
+.lang-toggle .lang-sep {
+  opacity: 0.4;
+}
+
 /* ---------- Split layout ---------- */
 .split {
   flex: 1 1 auto;
