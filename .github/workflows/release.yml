@@ -1,22 +1,74 @@
-name: release
+name: Release
 
 on:
   push:
-    tags: ["v*"]
+    tags:
+      - "v*"
   workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to build (e.g. 1.2.3). Falls back to package.json."
+        required: false
 
+# 既定は読み取りのみ。書き込みが要る release ジョブだけに job 単位で付与する。
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  release:
+  # ---- バージョン解決（各ジョブで共有）----
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.ver.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - id: ver
+        # 信頼できない入力は env 経由で受け、shell へ直接展開しない
+        env:
+          INPUT_VERSION: ${{ github.event.inputs.version }}
+          REF_NAME: ${{ github.ref_name }}
+          REF_TYPE: ${{ github.ref_type }}
+        run: |
+          if [ -n "$INPUT_VERSION" ]; then v="$INPUT_VERSION"
+          elif [ "$REF_TYPE" = tag ] && printf '%s' "$REF_NAME" | grep -qE '^v[0-9]'; then v="${REF_NAME#v}"
+          else v="$(node -p "require('./package.json').version")"; fi
+          # 後続ジョブで式展開されるため、安全な文字種へ正規化する
+          v=$(printf '%s' "$v" | tr -cd '0-9A-Za-z.+_-')
+          [ -n "$v" ] || v="0.0.0"
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+          echo "Version = $v"
+
+  # ---- 各OSでビルド → artifact 化（ここでは publish しない）----
+  build:
+    needs: version
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
+        include:
+          - os: macos-latest
+            platform: mac
+            artifacts: |
+              release/*.dmg
+              release/*.zip
+          - os: windows-latest
+            platform: win
+            artifacts: |
+              release/*.exe
+          - os: ubuntu-latest
+            platform: linux
+            artifacts: |
+              release/*.AppImage
+              release/*.deb
+              release/*.rpm
+              release/*.pacman
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-node@v4
         with:
@@ -25,12 +77,86 @@ jobs:
 
       - run: npm ci
 
+      # Linux の rpm / pacman ターゲットは外部ツールに依存する。
+      # rpm -> rpmbuild、pacman -> bsdtar(libarchive-tools)。ubuntu-latest が
+      # 将来 rpm を外しても落ちないよう、両方を明示インストールする。
+      - name: Install Linux packaging deps
+        if: matrix.platform == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libarchive-tools rpm
+
+      # タグのバージョンを成果物名へ反映（electron-builder は package.json を参照する）
+      - name: Set version
+        run: npm version "${{ needs.version.outputs.version }}" --no-git-tag-version --allow-same-version
+
       - name: Build renderer/main/preload
         run: npm run build
 
-      # electron-builder auto-detects the host OS and builds its targets,
-      # then publishes the artifacts to the GitHub Release for this tag.
-      - name: Package and publish
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx electron-builder --publish always
+      - name: Package (${{ matrix.platform }})
+        run: npx electron-builder --${{ matrix.platform }} --publish never
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ matrix.platform }}
+          path: ${{ matrix.artifacts }}
+          if-no-files-found: error
+
+  # ---- 成果物を集約して GitHub Release を作成（tag push 時のみ）----
+  release:
+    needs: [version, build]
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+
+      - name: List
+        run: find dist -type f | sort
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/**/*
+          # 英語の自動 changelog は付けず、下記の日本語ノートだけを公開する。
+          generate_release_notes: false
+          body: |
+            ## Mermaid Local Editor ${{ github.ref_name }}
+
+            完全ローカル・オフラインで動く、クロスプラットフォームの Mermaid ダイアグラム
+            エディタ（Electron）。Windows / macOS / Linux 用のネイティブアプリです。
+
+            ### macOS
+
+            | ファイル | 説明 |
+            |---|---|
+            | `mermaid-local-editor-*.dmg` | **おすすめ。** ディスクイメージ（Apple Silicon / arm64）。開いて Applications へドラッグ。 |
+            | `mermaid-local-editor-*.zip` | 同じ `.app` の zip 版。 |
+
+            > 未署名のため、初回起動は `.app` を右クリック →「開く」で Gatekeeper を回避してください。
+
+            ### Windows
+
+            | ファイル | 説明 |
+            |---|---|
+            | `mermaid-local-editor-*.exe` | NSIS インストーラ（Windows 10/11, x64）。 |
+
+            > 未署名のため SmartScreen の警告が出る場合は「詳細情報」→「実行」を選択してください。
+
+            ### Linux
+
+            お使いの系統に合うものを選んでください。
+
+            | ファイル | 対象 |
+            |---|---|
+            | `mermaid-local-editor-*.AppImage` | 汎用（全 distro）。実行権限を付与して起動。 |
+            | `mermaid-local-editor-*.deb` | Ubuntu / Debian 系 |
+            | `mermaid-local-editor-*.rpm` | AlmaLinux / RHEL / Fedora 系 |
+            | `mermaid-local-editor-*.pacman` | Arch 系 |
+
+            > いずれも完全オフラインで動作します（追加のネットワーク権限・外部送信はありません）。
