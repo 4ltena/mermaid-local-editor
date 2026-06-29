@@ -135,9 +135,7 @@ button:active {
   font-size: 10px;
 }
 .lang-menu {
-  position: absolute;
-  right: 0;
-  top: calc(100% + 4px);
+  position: fixed;
   margin: 0;
   padding: 4px;
   list-style: none;

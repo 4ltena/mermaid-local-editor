@@ -276,6 +276,11 @@ function updateLangButton(): void {
 }
 
 function openLangMenu(): void {
+  // position:fixed + JS placement so the toolbar's overflow clipping can't hide it.
+  const r = els.btnLang.getBoundingClientRect();
+  els.langMenu.style.top = `${Math.round(r.bottom + 4)}px`;
+  els.langMenu.style.right = `${Math.round(window.innerWidth - r.right)}px`;
+  els.langMenu.style.left = "auto";
   els.langMenu.hidden = false;
   els.btnLang.setAttribute("aria-expanded", "true");
 }
@@ -315,6 +320,7 @@ window.addEventListener("click", () => closeLangMenu());
 window.addEventListener("keydown", (e) => {
   if (e.key === "Escape") closeLangMenu();
 });
+window.addEventListener("resize", () => closeLangMenu());
 els.langMenu.addEventListener("click", (e) => e.stopPropagation());
 
 // ---------- theme select ----------
