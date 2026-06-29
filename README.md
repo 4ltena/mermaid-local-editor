@@ -9,8 +9,8 @@
 
 # Mermaid Local Editor
 
-完全ローカルで動く、クロスプラットフォームの Mermaid ダイアグラムエディタ（mermaid.live のデスクトップ版）。
-A fully local, cross-platform Mermaid diagram editor — a desktop edition of mermaid.live.
+完全ローカルで動く、クロスプラットフォームの Mermaid ダイアグラムエディタ
+A fully local, cross-platform Mermaid diagram editor.
 
 ---
 
@@ -21,7 +21,7 @@ A fully local, cross-platform Mermaid diagram editor — a desktop edition of me
 ## 日本語
 
 ### これは何？
-ブラウザ版の [mermaid.live](https://mermaid.live/) に相当する編集体験を、**完全ローカル・オフライン**で動くデスクトップアプリにしたものです。Electron + Vite + TypeScript 製で、コードを書くと右側のプレビューに図がリアルタイムで描画されます。図の生成はすべて端末内で完結し、ネットワーク通信は行いません。
+**完全ローカル・オフライン**で動く Mermaid 編集アプリです。Electron + Vite + TypeScript 製で、コードを書くと右側のプレビューに図がリアルタイムで描画されます。図の生成はすべて端末内で完結し、ネットワーク通信は行いません。
 
 ### 主な機能
 - **ライブプレビュー** — CodeMirror エディタに入力すると、デバウンス付きで即座に再描画。構文エラーはパネル表示し、直前の正常な図は保持。
@@ -80,7 +80,7 @@ git push origin v0.1.0
 ## English
 
 ### What is it?
-A desktop app that brings the editing experience of [mermaid.live](https://mermaid.live/) **fully local and offline**. Built with Electron + Vite + TypeScript: type your diagram code and it renders live in the preview pane. All rendering happens on-device with no network access.
+A Mermaid editing app that runs **fully local and offline**. Built with Electron + Vite + TypeScript: type your diagram code and it renders live in the preview pane. All rendering happens on-device with no network access.
 
 ### Key Features
 - **Live preview** — debounced re-render as you type in the CodeMirror editor; syntax errors show in a panel while the last valid diagram is kept.
