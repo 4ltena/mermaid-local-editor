@@ -219,6 +219,13 @@ button:active {
 .exp-num--scale {
   width: 52px;
 }
+.exp-row.is-disabled {
+  opacity: 0.5;
+}
+.exp-num:disabled {
+  color: var(--text-soft);
+  cursor: not-allowed;
+}
 .exp-x {
   color: var(--text-soft);
 }

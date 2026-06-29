@@ -47,7 +47,7 @@ const els = {
   expW: $<HTMLInputElement>("exp-w"),
   expH: $<HTMLInputElement>("exp-h"),
   expScaleN: $<HTMLInputElement>("exp-scale-n"),
-  expLock: $("exp-lock"),
+  expLock: $<HTMLButtonElement>("exp-lock"),
   expRun: $("exp-run"),
   btnThemeUi: $("btn-theme-ui"),
   btnLang: $("btn-lang"),
@@ -382,8 +382,14 @@ function expFillCustomFromAuto(): void {
 function expSyncRows(): void {
   const mode =
     els.expDialog.querySelector<HTMLInputElement>('input[name="exp-size"]:checked')?.value ?? "auto";
-  els.expScaleRow.hidden = mode !== "auto";
-  els.expCustomRow.hidden = mode !== "custom";
+  const auto = mode !== "custom";
+  els.expScaleRow.hidden = !auto;
+  // The px×px row stays visible; in auto it is shown disabled and dimmed
+  // (a preview of the dimensions auto will produce). In custom it is editable.
+  els.expCustomRow.classList.toggle("is-disabled", auto);
+  els.expW.disabled = auto;
+  els.expH.disabled = auto;
+  els.expLock.disabled = auto;
 }
 
 function expLocked(): boolean {
