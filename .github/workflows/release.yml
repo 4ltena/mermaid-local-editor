@@ -49,15 +49,27 @@ jobs:
         include:
           - os: macos-latest
             platform: mac
+            key: mac
+            args: ""
             artifacts: |
               release/*.dmg
               release/*.zip
           - os: windows-latest
             platform: win
+            key: win-x64
+            args: "--x64"
             artifacts: |
-              release/*.exe
+              release/*-x64.exe
+          - os: windows-latest
+            platform: win
+            key: win-arm64
+            args: "--arm64"
+            artifacts: |
+              release/*-arm64.exe
           - os: ubuntu-latest
             platform: linux
+            key: linux
+            args: ""
             artifacts: |
               release/*.AppImage
               release/*.deb
@@ -93,13 +105,13 @@ jobs:
       - name: Build renderer/main/preload
         run: npm run build
 
-      - name: Package (${{ matrix.platform }})
-        run: npx electron-builder --${{ matrix.platform }} --publish never
+      - name: Package (${{ matrix.key }})
+        run: npx electron-builder --${{ matrix.platform }} ${{ matrix.args }} --publish never
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: dist-${{ matrix.platform }}
+          name: dist-${{ matrix.key }}
           path: ${{ matrix.artifacts }}
           if-no-files-found: error
 
@@ -123,40 +135,42 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: dist/**/*
-          # 英語の自動 changelog は付けず、下記の日本語ノートだけを公開する。
+          # 紹介段落のみ日英併記、以降は英語に統一する。
           generate_release_notes: false
           body: |
             ## Mermaid Local Editor ${{ github.ref_name }}
 
-            完全ローカル・オフラインで動く、クロスプラットフォームの Mermaid ダイアグラム
-            エディタ（Electron）。Windows / macOS / Linux 用のネイティブアプリです。
+            完全ローカル・オフラインで動く、クロスプラットフォームの Mermaid ダイアグラムエディタ（Electron）。Windows / macOS / Linux 用のネイティブアプリです。
+
+            A fully local, offline, cross-platform Mermaid diagram editor (Electron). Native apps for Windows / macOS / Linux.
 
             ### macOS
 
-            | ファイル | 説明 |
+            | File | Description |
             |---|---|
-            | `mermaid-local-editor-*.dmg` | **おすすめ。** ディスクイメージ（Apple Silicon / arm64）。開いて Applications へドラッグ。 |
-            | `mermaid-local-editor-*.zip` | 同じ `.app` の zip 版。 |
+            | `mermaid-local-editor-*-universal.dmg` | **Recommended.** Universal disk image (Apple Silicon + Intel). Open it and drag to Applications. |
+            | `mermaid-local-editor-*-universal.zip` | The same `.app`, zipped. |
 
-            > 未署名のため、初回起動は `.app` を右クリック →「開く」で Gatekeeper を回避してください。
+            > Unsigned build: on first launch, right-click the `.app` → "Open" to get past Gatekeeper.
 
             ### Windows
 
-            | ファイル | 説明 |
+            | File | Description |
             |---|---|
-            | `mermaid-local-editor-*.exe` | NSIS インストーラ（Windows 10/11, x64）。 |
+            | `mermaid-local-editor-*-x64.exe` | NSIS installer for Intel/AMD 64-bit (most PCs). |
+            | `mermaid-local-editor-*-arm64.exe` | NSIS installer for Windows on ARM. |
 
-            > 未署名のため SmartScreen の警告が出る場合は「詳細情報」→「実行」を選択してください。
+            > Unsigned build: if SmartScreen warns, choose "More info" → "Run anyway".
 
             ### Linux
 
-            お使いの系統に合うものを選んでください。
+            Choose the file that matches your distro.
 
-            | ファイル | 対象 |
+            | File | Target |
             |---|---|
-            | `mermaid-local-editor-*.AppImage` | 汎用（全 distro）。実行権限を付与して起動。 |
-            | `mermaid-local-editor-*.deb` | Ubuntu / Debian 系 |
-            | `mermaid-local-editor-*.rpm` | AlmaLinux / RHEL / Fedora 系 |
-            | `mermaid-local-editor-*.pacman` | Arch 系 |
+            | `mermaid-local-editor-*.AppImage` | Universal (all distros). Make it executable and run. |
+            | `mermaid-local-editor-*.deb` | Ubuntu / Debian family |
+            | `mermaid-local-editor-*.rpm` | AlmaLinux / RHEL / Fedora family |
+            | `mermaid-local-editor-*.pacman` | Arch family |
 
-            > いずれも完全オフラインで動作します（追加のネットワーク権限・外部送信はありません）。
+            > All run fully offline (no extra network permissions, no outbound data).
