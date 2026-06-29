@@ -114,29 +114,135 @@ button:active {
   background: var(--bg-soft);
 }
 
-#btn-export-svg,
-#btn-export-png,
+#btn-export,
 #btn-copy {
   background: var(--accent);
   color: var(--accent-text);
   border-color: var(--accent);
 }
 
-.lang-toggle {
+/* language dropdown */
+.lang-dd {
+  position: relative;
+}
+.lang-trigger {
   display: inline-flex;
   align-items: center;
   gap: 4px;
 }
-.lang-toggle .lang-seg {
-  opacity: 0.5;
+.lang-trigger .lang-caret {
+  opacity: 0.6;
+  font-size: 10px;
 }
-.lang-toggle .lang-seg.is-active {
-  opacity: 1;
-  font-weight: 600;
+.lang-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+  z-index: 50;
+  min-width: 160px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+.lang-item {
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  font-size: 13px;
+}
+.lang-item:hover {
+  background: var(--bg-soft);
   color: var(--accent);
 }
-.lang-toggle .lang-sep {
-  opacity: 0.4;
+
+/* export modal */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal[hidden] {
+  display: none;
+}
+.modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+}
+.modal__panel {
+  position: relative;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px 20px;
+  min-width: 320px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+.modal__panel h2 {
+  margin: 0 0 12px;
+  font-size: 16px;
+}
+.exp-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 10px 0;
+  flex-wrap: wrap;
+}
+.exp-row label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.exp-label {
+  min-width: 56px;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+.exp-num {
+  width: 84px;
+  padding: 4px 6px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+}
+.exp-num--scale {
+  width: 52px;
+}
+.exp-x {
+  color: var(--text-soft);
+}
+.exp-lock {
+  display: inline-flex;
+  padding: 4px;
+  color: var(--text-soft);
+}
+.exp-lock.is-locked {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.exp-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+.exp-run {
+  background: var(--accent);
+  color: var(--accent-text);
+  border-color: var(--accent);
 }
 
 /* ---------- Split layout ---------- */

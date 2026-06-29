@@ -3,6 +3,38 @@
 [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/) 形式に概ね従い、[セマンティックバージョニング](https://semver.org/lang/ja/) を採用しています。
 This file roughly follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and uses [Semantic Versioning](https://semver.org/).
 
+## [0.4.0] — 2026-06-29
+
+エクスポートの刷新と多言語化。
+
+### 追加
+- 単一の Export ボタンとダイアログ。形式 SVG / PNG / WebP、サイズは auto（倍率 1×/2×/3×/任意 n×）または custom（px×px、チェーンで縦横比固定）。
+- UI 言語を11に拡張（EN JA TW CN KR FR ES DE PT IT RU）。ヘッダーはカスタムプルダウン（トリガーは2文字コード、選択肢はコード+ネイティブ名）。
+
+### 変更
+- 旧 SVG / PNG ボタンを Export ダイアログへ統合。i18n の基準言語を en に（フォールバック en）。
+
+### 備考
+- 追加9言語の翻訳は機械翻訳ベース。ネイティブによる確認を推奨。
+
+### 検証
+- 型検査・ユニットテスト（17件）・本番ビルドがすべて成功。
+
+Revamped export and broader localization.
+
+### Added
+- A single Export button and dialog: SVG / PNG / WebP, with auto size (scale 1×/2×/3× or a free n×) or custom px×px with an aspect-ratio lock.
+- UI languages expanded to 11 (EN JA TW CN KR FR ES DE PT IT RU); the header uses a custom dropdown (a 2-letter code trigger, code+native-name options).
+
+### Changed
+- The old SVG / PNG buttons are folded into the Export dialog. The i18n base language is now en (fallback en).
+
+### Notes
+- The 9 added languages are machine-translated; native review is recommended.
+
+### Verified
+- Type-check, unit tests (17), and the production build all pass.
+
 ## [0.3.0] — 2026-06-29
 
 エディタの挙動調整と、CI の供給網ハードニング。

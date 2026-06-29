@@ -6,9 +6,10 @@ import {
   svgIntrinsicSize,
   type MermaidTheme,
 } from "./mermaid-render";
-import { exportSvg, exportPng } from "./export";
+import { exportDiagram, lockedCounterpart } from "./export";
 import { SAMPLES, DEFAULT_CODE } from "./samples";
-import { detectInitialLocale, applyDom, getLocale, setLocale, t } from "./i18n";
+import { detectInitialLocale, applyDom, getLocale, setLocale, t, LOCALES } from "./i18n";
+import type { Locale } from "./i18n";
 
 // ---------- persisted state ----------
 const LS = {
@@ -39,10 +40,18 @@ const els = {
   btnZoomOut: $("btn-zoom-out"),
   btnZoomReset: $("btn-zoom-reset"),
   btnCopy: $("btn-copy"),
-  btnSvg: $("btn-export-svg"),
-  btnPng: $("btn-export-png"),
+  btnExport: $("btn-export"),
+  expDialog: $<HTMLDivElement>("export-dialog"),
+  expCustomRow: $<HTMLDivElement>("exp-custom-row"),
+  expScaleRow: $<HTMLDivElement>("exp-scale-row"),
+  expW: $<HTMLInputElement>("exp-w"),
+  expH: $<HTMLInputElement>("exp-h"),
+  expScaleN: $<HTMLInputElement>("exp-scale-n"),
+  expLock: $("exp-lock"),
+  expRun: $("exp-run"),
   btnThemeUi: $("btn-theme-ui"),
   btnLang: $("btn-lang"),
+  langMenu: $<HTMLUListElement>("lang-menu"),
 };
 
 // ---------- i18n ----------
@@ -232,7 +241,7 @@ const editor = new CodeEditor({
 for (const s of SAMPLES) {
   const opt = document.createElement("option");
   opt.value = s.id;
-  opt.textContent = s.label[getLocale()];
+  opt.textContent = s.label[getLocale()] ?? s.label.en;
   els.sampleSelect.appendChild(opt);
 }
 els.sampleSelect.addEventListener("change", () => {
@@ -248,28 +257,65 @@ els.sampleSelect.addEventListener("change", () => {
   // currently loaded (do not reset it back to the "— 選択 —" placeholder).
 });
 
-// ---------- language toggle ----------
+// ---------- language dropdown ----------
 function relabelSamples(): void {
   for (const opt of Array.from(els.sampleSelect.options)) {
     const s = SAMPLES.find((x) => x.id === opt.value);
-    if (s) opt.textContent = s.label[getLocale()];
+    if (s) opt.textContent = s.label[getLocale()] ?? s.label.en;
   }
 }
 
 function updateLangButton(): void {
   const loc = getLocale();
-  els.btnLang.querySelectorAll<HTMLElement>(".lang-seg").forEach((seg) => {
-    seg.classList.toggle("is-active", seg.dataset.locale === loc);
+  const cur = LOCALES.find((l) => l.code === loc);
+  const codeEl = els.btnLang.querySelector<HTMLElement>(".lang-code");
+  if (codeEl && cur) codeEl.textContent = cur.short;
+  els.langMenu.querySelectorAll<HTMLElement>(".lang-item").forEach((li) => {
+    li.setAttribute("aria-selected", String(li.dataset.locale === loc));
   });
 }
+
+function openLangMenu(): void {
+  els.langMenu.hidden = false;
+  els.btnLang.setAttribute("aria-expanded", "true");
+}
+function closeLangMenu(): void {
+  els.langMenu.hidden = true;
+  els.btnLang.setAttribute("aria-expanded", "false");
+}
+
+function buildLangMenu(): void {
+  els.langMenu.replaceChildren();
+  for (const l of LOCALES) {
+    const li = document.createElement("li");
+    li.className = "lang-item";
+    li.setAttribute("role", "option");
+    li.dataset.locale = l.code;
+    li.textContent = `${l.short} ${l.name}`;
+    li.addEventListener("click", () => {
+      setLocale(l.code as Locale);
+      relabelSamples();
+      updateLangButton();
+      if (lastStatusKey) els.status.textContent = t(lastStatusKey);
+      closeLangMenu();
+    });
+    els.langMenu.appendChild(li);
+  }
+}
+
+buildLangMenu();
 updateLangButton();
 
-els.btnLang.addEventListener("click", () => {
-  setLocale(getLocale() === "ja" ? "en" : "ja");
-  relabelSamples();
-  updateLangButton();
-  if (lastStatusKey) els.status.textContent = t(lastStatusKey);
+els.btnLang.addEventListener("click", (e) => {
+  e.stopPropagation();
+  if (els.langMenu.hidden) openLangMenu();
+  else closeLangMenu();
 });
+window.addEventListener("click", () => closeLangMenu());
+window.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeLangMenu();
+});
+els.langMenu.addEventListener("click", (e) => e.stopPropagation());
 
 // ---------- theme select ----------
 els.themeSelect.addEventListener("change", () => {
@@ -300,33 +346,146 @@ function currentSvg(): SVGSVGElement | null {
   return els.canvas.querySelector("svg");
 }
 
-els.btnSvg.addEventListener("click", () => {
-  const svg = currentSvg();
-  if (svg) {
-    exportSvg(svg);
-    setStatus("status.svgSaved");
-  } else {
-    setStatus("status.noRender");
-  }
-});
+// ---------- export dialog ----------
+const EXP = {
+  fmt: "mle.exportFormat",
+  mode: "mle.exportSizeMode",
+  scale: "mle.exportScale",
+  lock: "mle.exportLock",
+};
 
-els.btnPng.addEventListener("click", async () => {
+function expIntrinsic(): { w: number; h: number } {
   const svg = currentSvg();
-  if (!svg) {
+  if (!svg) return { w: 0, h: 0 };
+  return svgIntrinsicSize(svg);
+}
+
+function expScaleValue(): number {
+  const sel = els.expDialog.querySelector<HTMLInputElement>('input[name="exp-scale"]:checked');
+  if (sel && sel.value !== "n") return Number(sel.value);
+  return Math.max(1, Math.min(10, Number(els.expScaleN.value) || 1));
+}
+
+function expFillCustomFromAuto(): void {
+  const { w, h } = expIntrinsic();
+  const s = expScaleValue();
+  els.expW.value = String(Math.max(1, Math.round(w * s)));
+  els.expH.value = String(Math.max(1, Math.round(h * s)));
+}
+
+function expSyncRows(): void {
+  const mode =
+    els.expDialog.querySelector<HTMLInputElement>('input[name="exp-size"]:checked')?.value ?? "auto";
+  els.expScaleRow.hidden = mode !== "auto";
+  els.expCustomRow.hidden = mode !== "custom";
+}
+
+function expLocked(): boolean {
+  return els.expLock.classList.contains("is-locked");
+}
+
+function openExportDialog(): void {
+  if (!currentSvg()) {
     setStatus("status.noRender");
     return;
   }
-  setStatus("status.pngGenerating");
+  const fmt = localStorage.getItem(EXP.fmt) ?? "svg";
+  const fmtEl = els.expDialog.querySelector<HTMLInputElement>(`input[name="exp-format"][value="${fmt}"]`);
+  if (fmtEl) fmtEl.checked = true;
+  const mode = localStorage.getItem(EXP.mode) ?? "auto";
+  const modeEl = els.expDialog.querySelector<HTMLInputElement>(`input[name="exp-size"][value="${mode}"]`);
+  if (modeEl) modeEl.checked = true;
+  const scale = localStorage.getItem(EXP.scale) ?? "2";
+  const preset = els.expDialog.querySelector<HTMLInputElement>(`input[name="exp-scale"][value="${scale}"]`);
+  if (preset) preset.checked = true;
+  else {
+    const nEl = els.expDialog.querySelector<HTMLInputElement>('input[name="exp-scale"][value="n"]');
+    if (nEl) nEl.checked = true;
+    els.expScaleN.value = scale;
+  }
+  els.expLock.classList.toggle("is-locked", localStorage.getItem(EXP.lock) !== "0");
+  els.expLock.setAttribute("aria-pressed", String(expLocked()));
+  expSyncRows();
+  expFillCustomFromAuto();
+  els.expDialog.hidden = false;
+}
+
+function closeExportDialog(): void {
+  els.expDialog.hidden = true;
+}
+
+els.btnExport.addEventListener("click", openExportDialog);
+els.expDialog.querySelectorAll<HTMLElement>("[data-close]").forEach((el) =>
+  el.addEventListener("click", closeExportDialog),
+);
+window.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && !els.expDialog.hidden) closeExportDialog();
+});
+els.expDialog
+  .querySelectorAll<HTMLInputElement>('input[name="exp-size"], input[name="exp-scale"]')
+  .forEach((el) =>
+    el.addEventListener("change", () => {
+      expSyncRows();
+      expFillCustomFromAuto();
+    }),
+  );
+els.expScaleN.addEventListener("input", () => {
+  // Editing the n× field implies the n× preset, even if the radio wasn't clicked
+  // (clicking the nested number input does not activate the label's radio).
+  const nRadio = els.expDialog.querySelector<HTMLInputElement>('input[name="exp-scale"][value="n"]');
+  if (nRadio) nRadio.checked = true;
+  expFillCustomFromAuto();
+});
+
+els.expLock.addEventListener("click", () => {
+  const locked = !expLocked();
+  els.expLock.classList.toggle("is-locked", locked);
+  els.expLock.setAttribute("aria-pressed", String(locked));
+});
+
+els.expW.addEventListener("input", () => {
+  if (!expLocked()) return;
+  els.expH.value = String(lockedCounterpart("w", Number(els.expW.value) || 0, expIntrinsic()));
+});
+els.expH.addEventListener("input", () => {
+  if (!expLocked()) return;
+  els.expW.value = String(lockedCounterpart("h", Number(els.expH.value) || 0, expIntrinsic()));
+});
+
+els.expRun.addEventListener("click", async () => {
+  const svg = currentSvg();
+  if (!svg) {
+    setStatus("status.noRender");
+    closeExportDialog();
+    return;
+  }
+  const format = (els.expDialog.querySelector<HTMLInputElement>('input[name="exp-format"]:checked')?.value ??
+    "svg") as "svg" | "png" | "webp";
+  const mode =
+    els.expDialog.querySelector<HTMLInputElement>('input[name="exp-size"]:checked')?.value ?? "auto";
+  const intrinsic = expIntrinsic();
+  let width: number;
+  let height: number;
+  if (mode === "custom") {
+    width = Number(els.expW.value) || intrinsic.w;
+    height = Number(els.expH.value) || intrinsic.h;
+  } else {
+    const s = expScaleValue();
+    width = intrinsic.w * s;
+    height = intrinsic.h * s;
+  }
+  localStorage.setItem(EXP.fmt, format);
+  localStorage.setItem(EXP.mode, mode);
+  localStorage.setItem(EXP.scale, String(expScaleValue()));
+  localStorage.setItem(EXP.lock, expLocked() ? "1" : "0");
+  closeExportDialog();
+  setStatus("status.exporting");
   try {
-    await exportPng(svg);
-    setStatus("status.pngSaved");
+    await exportDiagram(svg, { format, width, height });
+    setStatus("status.exported");
   } catch (e) {
-    if (e instanceof Error) {
-      lastStatusKey = null;
-      els.status.textContent = e.message;
-    } else {
-      setStatus("status.pngFailed");
-    }
+    lastStatusKey = null;
+    els.status.textContent = e instanceof Error ? e.message : t("status.exportFailed");
   }
 });
 

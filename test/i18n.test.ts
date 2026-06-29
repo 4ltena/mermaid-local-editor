@@ -1,25 +1,41 @@
 import { describe, it, expect } from "vitest";
-import { translate, resolveLocale } from "../src/i18n";
+import { translate, resolveLocale, LOCALES } from "../src/i18n";
 
 describe("translate", () => {
-  it("returns the string for the locale", () => {
-    expect(translate("en", "status.ready")).toBe("Ready");
-    expect(translate("ja", "status.ready")).toBe("準備完了");
+  it("returns the string for en and ja", () => {
+    expect(translate("en", "export.run")).toBe("Export");
+    expect(translate("ja", "export.run")).toBe("書き出す");
   });
-  it("falls back to the key when missing in both locales", () => {
+  it("falls back to en then the key for a missing entry", () => {
     expect(translate("en", "no.such.key")).toBe("no.such.key");
+    expect(translate("fr", "no.such.key")).toBe("no.such.key");
+  });
+  it("uses each locale's own translation when present", () => {
+    expect(translate("fr", "export.run")).toBe("Exporter");
+    expect(translate("ko", "status.exported")).toBe("내보냈습니다");
   });
 });
 
 describe("resolveLocale", () => {
-  it("honors a valid stored value over navigator", () => {
-    expect(resolveLocale("ja", "en-US")).toBe("ja");
-    expect(resolveLocale("en", "ja-JP")).toBe("en");
+  it("honors a valid stored value", () => {
+    expect(resolveLocale("zh-TW", "en-US")).toBe("zh-TW");
+    expect(resolveLocale("ru", "ja-JP")).toBe("ru");
   });
-  it("ignores an invalid stored value and uses navigator", () => {
-    expect(resolveLocale(null, "ja-JP")).toBe("ja");
-    expect(resolveLocale("xx", "ja")).toBe("ja");
-    expect(resolveLocale(null, "en-US")).toBe("en");
-    expect(resolveLocale(null, "fr-FR")).toBe("en");
+  it("maps navigator language when stored is absent/invalid", () => {
+    expect(resolveLocale(null, "ja")).toBe("ja");
+    expect(resolveLocale(null, "zh-TW")).toBe("zh-TW");
+    expect(resolveLocale(null, "zh-Hant")).toBe("zh-TW");
+    expect(resolveLocale(null, "zh-CN")).toBe("zh-CN");
+    expect(resolveLocale(null, "zh")).toBe("zh-CN");
+    expect(resolveLocale(null, "ko-KR")).toBe("ko");
+    expect(resolveLocale(null, "fr-FR")).toBe("fr");
+    expect(resolveLocale(null, "pt-BR")).toBe("pt");
+    expect(resolveLocale("xx", "de")).toBe("de");
+    expect(resolveLocale(null, "xx")).toBe("en");
+  });
+  it("lists 11 locales with short codes", () => {
+    expect(LOCALES.map((l) => l.short)).toEqual(
+      ["EN", "JA", "TW", "CN", "KR", "FR", "ES", "DE", "PT", "IT", "RU"],
+    );
   });
 });
