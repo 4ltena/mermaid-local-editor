@@ -34,7 +34,6 @@
           <button id="btn-zoom-in" data-i18n-title="title.zoomIn" title="Zoom in">＋</button>
         </div>
         <div class="toolbar__group toolbar__group--right">
-          <button id="btn-copy" data-i18n-title="title.copy" title="Copy code"><span data-i18n="btn.copy">Copy</span></button>
           <button id="btn-export" data-i18n-title="title.export" title="Export the diagram"><span data-i18n="btn.export">Export</span></button>
           <div class="lang-dd">
             <button id="btn-lang" class="lang-trigger" data-i18n-title="title.lang" title="Language" aria-haspopup="listbox" aria-expanded="false">
@@ -49,6 +48,10 @@
       <main class="split" id="split">
         <section class="pane pane--editor">
           <div id="editor" class="editor"></div>
+          <button id="editor-copy" class="editor-copy" type="button" data-i18n-title="title.copy" title="Copy code" aria-label="Copy code">
+            <svg class="icon-copy" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            <svg class="icon-check" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M5 13l4 4 10-11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
         </section>
         <div class="gutter" id="gutter" data-i18n-title="title.gutter" title="Drag to resize"></div>
         <section class="pane pane--preview">
@@ -89,7 +92,7 @@
           <label><input type="radio" name="exp-scale" value="n" /> <input type="number" id="exp-scale-n" min="1" max="10" step="1" value="2" class="exp-num exp-num--scale" /> ×</label>
         </div>
 
-        <div class="exp-row" id="exp-custom-row" hidden>
+        <div class="exp-row" id="exp-custom-row">
           <input type="number" id="exp-w" min="1" class="exp-num" /> px
           <span class="exp-x">×</span>
           <input type="number" id="exp-h" min="1" class="exp-num" /> px

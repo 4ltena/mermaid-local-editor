@@ -3,6 +3,32 @@
 [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/) 形式に概ね従い、[セマンティックバージョニング](https://semver.org/lang/ja/) を採用しています。
 This file roughly follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and uses [Semantic Versioning](https://semver.org/).
 
+## [0.4.1] — 2026-06-29
+
+UI の微調整と、言語切替の不具合修正。
+
+### 修正
+- 言語プルダウンがツールバーの overflow にクリップされて開かなかった不具合を修正（`position: fixed` 化）。v0.4.0 のリグレッション。
+
+### 変更
+- エクスポートの auto 選択時、px×px 欄を非表示にせず、出力寸法をグレー（無効）で表示する。
+- コードのコピーをツールバーのボタンからエディタ右上のホバー式ボタン（押すと ✓）へ移動。
+
+### 検証
+- 型検査・ユニットテスト（17件）・本番ビルドがすべて成功。
+
+UI polish and a language-switch bug fix.
+
+### Fixed
+- The language dropdown was clipped by the toolbar's overflow and would not open; switched it to `position: fixed`. (Regression from v0.4.0.)
+
+### Changed
+- In auto export mode, the px×px fields are shown disabled/grayed (a preview of the output size) instead of hidden.
+- Moved code copy from a toolbar button to a hover button in the editor's top-right (shows ✓ on click).
+
+### Verified
+- Type-check, unit tests (17), and the production build all pass.
+
 ## [0.4.0] — 2026-06-29
 
 エクスポートの刷新と多言語化。

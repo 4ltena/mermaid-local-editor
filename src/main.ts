@@ -39,7 +39,7 @@ const els = {
   btnZoomIn: $("btn-zoom-in"),
   btnZoomOut: $("btn-zoom-out"),
   btnZoomReset: $("btn-zoom-reset"),
-  btnCopy: $("btn-copy"),
+  editorCopy: $<HTMLButtonElement>("editor-copy"),
   btnExport: $("btn-export"),
   expDialog: $<HTMLDivElement>("export-dialog"),
   expCustomRow: $<HTMLDivElement>("exp-custom-row"),
@@ -47,7 +47,7 @@ const els = {
   expW: $<HTMLInputElement>("exp-w"),
   expH: $<HTMLInputElement>("exp-h"),
   expScaleN: $<HTMLInputElement>("exp-scale-n"),
-  expLock: $("exp-lock"),
+  expLock: $<HTMLButtonElement>("exp-lock"),
   expRun: $("exp-run"),
   btnThemeUi: $("btn-theme-ui"),
   btnLang: $("btn-lang"),
@@ -276,6 +276,11 @@ function updateLangButton(): void {
 }
 
 function openLangMenu(): void {
+  // position:fixed + JS placement so the toolbar's overflow clipping can't hide it.
+  const r = els.btnLang.getBoundingClientRect();
+  els.langMenu.style.top = `${Math.round(r.bottom + 4)}px`;
+  els.langMenu.style.right = `${Math.round(window.innerWidth - r.right)}px`;
+  els.langMenu.style.left = "auto";
   els.langMenu.hidden = false;
   els.btnLang.setAttribute("aria-expanded", "true");
 }
@@ -315,6 +320,7 @@ window.addEventListener("click", () => closeLangMenu());
 window.addEventListener("keydown", (e) => {
   if (e.key === "Escape") closeLangMenu();
 });
+window.addEventListener("resize", () => closeLangMenu());
 els.langMenu.addEventListener("click", (e) => e.stopPropagation());
 
 // ---------- theme select ----------
@@ -333,10 +339,11 @@ els.btnZoomReset.addEventListener("click", () => {
   else panzoom.reset();
 });
 
-els.btnCopy.addEventListener("click", async () => {
+els.editorCopy.addEventListener("click", async () => {
   try {
     await navigator.clipboard.writeText(editor.getValue());
-    setStatus("status.copied");
+    els.editorCopy.classList.add("is-copied");
+    window.setTimeout(() => els.editorCopy.classList.remove("is-copied"), 1500);
   } catch {
     setStatus("status.copyFailed");
   }
@@ -376,8 +383,14 @@ function expFillCustomFromAuto(): void {
 function expSyncRows(): void {
   const mode =
     els.expDialog.querySelector<HTMLInputElement>('input[name="exp-size"]:checked')?.value ?? "auto";
-  els.expScaleRow.hidden = mode !== "auto";
-  els.expCustomRow.hidden = mode !== "custom";
+  const auto = mode !== "custom";
+  els.expScaleRow.hidden = !auto;
+  // The px×px row stays visible; in auto it is shown disabled and dimmed
+  // (a preview of the dimensions auto will produce). In custom it is editable.
+  els.expCustomRow.classList.toggle("is-disabled", auto);
+  els.expW.disabled = auto;
+  els.expH.disabled = auto;
+  els.expLock.disabled = auto;
 }
 
 function expLocked(): boolean {
