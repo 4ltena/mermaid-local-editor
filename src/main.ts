@@ -160,11 +160,19 @@ configureMermaid(currentTheme);
 
 let lastGoodSize: { w: number; h: number } | null = null;
 let renderToken = 0;
+let lastStatusKey: string | null = null;
+
+/** Set the status bar from an i18n key and remember it, so it can be
+ *  re-translated when the language changes. */
+function setStatus(key: string): void {
+  lastStatusKey = key;
+  els.status.textContent = t(key);
+}
 
 function showError(msg: string): void {
   els.errorPanel.hidden = false;
   els.errorPanel.textContent = msg;
-  els.status.textContent = t("status.syntaxError");
+  setStatus("status.syntaxError");
 }
 
 function clearError(): void {
@@ -188,7 +196,7 @@ async function render(code: string, refit: boolean): Promise<void> {
       if (refit || !lastGoodSize) panzoom.fit(size.w, size.h);
       lastGoodSize = size;
     }
-    els.status.textContent = t("status.rendered");
+    setStatus("status.rendered");
   } catch (err) {
     if (token !== renderToken) return;
     const msg = err instanceof Error ? err.message : String(err);
@@ -198,9 +206,13 @@ async function render(code: string, refit: boolean): Promise<void> {
 
 // ---------- editor ----------
 let debounceTimer: number | undefined;
+let loadingSample = false;
 function scheduleRender(code: string): void {
+  // A manual edit means the loaded sample no longer matches; clear the dropdown.
+  // Skipped while a sample is being loaded programmatically (see the change handler).
+  if (!loadingSample) els.sampleSelect.value = "";
   window.clearTimeout(debounceTimer);
-  els.status.textContent = t("status.typing");
+  setStatus("status.typing");
   debounceTimer = window.setTimeout(() => {
     localStorage.setItem(LS.code, code);
     void render(code, false);
@@ -226,7 +238,9 @@ for (const s of SAMPLES) {
 els.sampleSelect.addEventListener("change", () => {
   const s = SAMPLES.find((x) => x.id === els.sampleSelect.value);
   if (s) {
+    loadingSample = true;
     editor.setValue(s.code);
+    loadingSample = false;
     void render(s.code, true);
     localStorage.setItem(LS.code, s.code);
   }
@@ -254,6 +268,7 @@ els.btnLang.addEventListener("click", () => {
   setLocale(getLocale() === "ja" ? "en" : "ja");
   relabelSamples();
   updateLangButton();
+  if (lastStatusKey) els.status.textContent = t(lastStatusKey);
 });
 
 // ---------- theme select ----------
@@ -275,9 +290,9 @@ els.btnZoomReset.addEventListener("click", () => {
 els.btnCopy.addEventListener("click", async () => {
   try {
     await navigator.clipboard.writeText(editor.getValue());
-    els.status.textContent = t("status.copied");
+    setStatus("status.copied");
   } catch {
-    els.status.textContent = t("status.copyFailed");
+    setStatus("status.copyFailed");
   }
 });
 
@@ -289,24 +304,29 @@ els.btnSvg.addEventListener("click", () => {
   const svg = currentSvg();
   if (svg) {
     exportSvg(svg);
-    els.status.textContent = t("status.svgSaved");
+    setStatus("status.svgSaved");
   } else {
-    els.status.textContent = t("status.noRender");
+    setStatus("status.noRender");
   }
 });
 
 els.btnPng.addEventListener("click", async () => {
   const svg = currentSvg();
   if (!svg) {
-    els.status.textContent = t("status.noRender");
+    setStatus("status.noRender");
     return;
   }
-  els.status.textContent = t("status.pngGenerating");
+  setStatus("status.pngGenerating");
   try {
     await exportPng(svg);
-    els.status.textContent = t("status.pngSaved");
+    setStatus("status.pngSaved");
   } catch (e) {
-    els.status.textContent = e instanceof Error ? e.message : t("status.pngFailed");
+    if (e instanceof Error) {
+      lastStatusKey = null;
+      els.status.textContent = e.message;
+    } else {
+      setStatus("status.pngFailed");
+    }
   }
 });
 
@@ -315,14 +335,22 @@ els.btnThemeUi.addEventListener("click", () => {
   localStorage.setItem(LS.ui, uiDark ? "dark" : "light");
   applyUiTheme(uiDark);
   editor.setDark(uiDark);
-  // Keep the diagram readable in dark mode: follow the UI theme so the mermaid
-  // edges/arrows and text stay visible. The テーマ dropdown can still override
-  // this manually until the next UI-theme toggle.
-  currentTheme = uiDark ? "dark" : "default";
-  els.themeSelect.value = currentTheme;
-  localStorage.setItem(LS.theme, currentTheme);
-  configureMermaid(currentTheme);
-  void render(editor.getValue(), false);
+  // Only swap the paired default<->dark diagram themes with the UI theme; leave
+  // forest/neutral/etc. untouched so an explicit choice is preserved.
+  const next: MermaidTheme | null = uiDark
+    ? currentTheme === "default"
+      ? "dark"
+      : null
+    : currentTheme === "dark"
+      ? "default"
+      : null;
+  if (next) {
+    currentTheme = next;
+    els.themeSelect.value = currentTheme;
+    localStorage.setItem(LS.theme, currentTheme);
+    configureMermaid(currentTheme);
+    void render(editor.getValue(), false);
+  }
 });
 
 // ---------- split gutter resize ----------
