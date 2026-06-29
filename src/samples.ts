@@ -1,13 +1,13 @@
 export interface Sample {
   id: string;
-  label: string;
+  label: { en: string; ja: string };
   code: string;
 }
 
 export const SAMPLES: Sample[] = [
   {
     id: "flowchart",
-    label: "フローチャート（ログイン）",
+    label: { en: "Flowchart (login)", ja: "フローチャート（ログイン）" },
     code: `flowchart TD
     A["ユーザーがIDとパスワードを入力"] --> B{"認証情報をDBに照会"}
     B -->|"成功"| C["ホーム画面へ遷移"]
@@ -16,7 +16,7 @@ export const SAMPLES: Sample[] = [
   },
   {
     id: "sequence",
-    label: "シーケンス図",
+    label: { en: "Sequence", ja: "シーケンス図" },
     code: `sequenceDiagram
     participant U as ユーザー
     participant S as システム
@@ -32,7 +32,7 @@ export const SAMPLES: Sample[] = [
   },
   {
     id: "class",
-    label: "クラス図",
+    label: { en: "Class", ja: "クラス図" },
     code: `classDiagram
     class User {
       +String name
@@ -49,7 +49,7 @@ export const SAMPLES: Sample[] = [
   },
   {
     id: "state",
-    label: "状態遷移図",
+    label: { en: "State", ja: "状態遷移図" },
     code: `stateDiagram-v2
     [*] --> 待機
     待機 --> 処理中 : 開始
@@ -60,7 +60,7 @@ export const SAMPLES: Sample[] = [
   },
   {
     id: "gantt",
-    label: "ガントチャート",
+    label: { en: "Gantt", ja: "ガントチャート" },
     code: `gantt
     title プロジェクト計画
     dateFormat YYYY-MM-DD
@@ -73,7 +73,7 @@ export const SAMPLES: Sample[] = [
   },
   {
     id: "pie",
-    label: "円グラフ",
+    label: { en: "Pie", ja: "円グラフ" },
     code: `pie title 利用ブラウザ
     "Chrome" : 62
     "Safari" : 18
@@ -82,7 +82,7 @@ export const SAMPLES: Sample[] = [
   },
   {
     id: "er",
-    label: "ER図",
+    label: { en: "ER", ja: "ER図" },
     code: `erDiagram
     CUSTOMER ||--o{ ORDER : places
     ORDER ||--|{ LINE_ITEM : contains
@@ -97,7 +97,7 @@ export const SAMPLES: Sample[] = [
   },
   {
     id: "mindmap",
-    label: "マインドマップ",
+    label: { en: "Mindmap", ja: "マインドマップ" },
     code: `mindmap
   root((Mermaid))
     描画

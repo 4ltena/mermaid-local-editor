@@ -8,6 +8,7 @@ import {
 } from "./mermaid-render";
 import { exportSvg, exportPng } from "./export";
 import { SAMPLES, DEFAULT_CODE } from "./samples";
+import { detectInitialLocale, applyDom, getLocale, setLocale, t } from "./i18n";
 
 // ---------- persisted state ----------
 const LS = {
@@ -41,7 +42,13 @@ const els = {
   btnSvg: $("btn-export-svg"),
   btnPng: $("btn-export-png"),
   btnThemeUi: $("btn-theme-ui"),
+  btnLang: $("btn-lang"),
 };
+
+// ---------- i18n ----------
+detectInitialLocale();
+document.documentElement.lang = getLocale();
+applyDom();
 
 // ---------- UI (light/dark) theme ----------
 function applyUiTheme(dark: boolean): void {
@@ -157,7 +164,7 @@ let renderToken = 0;
 function showError(msg: string): void {
   els.errorPanel.hidden = false;
   els.errorPanel.textContent = msg;
-  els.status.textContent = "構文エラー";
+  els.status.textContent = t("status.syntaxError");
 }
 
 function clearError(): void {
@@ -181,7 +188,7 @@ async function render(code: string, refit: boolean): Promise<void> {
       if (refit || !lastGoodSize) panzoom.fit(size.w, size.h);
       lastGoodSize = size;
     }
-    els.status.textContent = "描画完了";
+    els.status.textContent = t("status.rendered");
   } catch (err) {
     if (token !== renderToken) return;
     const msg = err instanceof Error ? err.message : String(err);
@@ -193,7 +200,7 @@ async function render(code: string, refit: boolean): Promise<void> {
 let debounceTimer: number | undefined;
 function scheduleRender(code: string): void {
   window.clearTimeout(debounceTimer);
-  els.status.textContent = "入力中…";
+  els.status.textContent = t("status.typing");
   debounceTimer = window.setTimeout(() => {
     localStorage.setItem(LS.code, code);
     void render(code, false);
@@ -213,7 +220,7 @@ const editor = new CodeEditor({
 for (const s of SAMPLES) {
   const opt = document.createElement("option");
   opt.value = s.id;
-  opt.textContent = s.label;
+  opt.textContent = s.label[getLocale()];
   els.sampleSelect.appendChild(opt);
 }
 els.sampleSelect.addEventListener("change", () => {
@@ -225,6 +232,28 @@ els.sampleSelect.addEventListener("change", () => {
   }
   // Leave the chosen option selected so the dropdown reflects which sample is
   // currently loaded (do not reset it back to the "— 選択 —" placeholder).
+});
+
+// ---------- language toggle ----------
+function relabelSamples(): void {
+  for (const opt of Array.from(els.sampleSelect.options)) {
+    const s = SAMPLES.find((x) => x.id === opt.value);
+    if (s) opt.textContent = s.label[getLocale()];
+  }
+}
+
+function updateLangButton(): void {
+  const loc = getLocale();
+  els.btnLang.querySelectorAll<HTMLElement>(".lang-seg").forEach((seg) => {
+    seg.classList.toggle("is-active", seg.dataset.locale === loc);
+  });
+}
+updateLangButton();
+
+els.btnLang.addEventListener("click", () => {
+  setLocale(getLocale() === "ja" ? "en" : "ja");
+  relabelSamples();
+  updateLangButton();
 });
 
 // ---------- theme select ----------
@@ -246,9 +275,9 @@ els.btnZoomReset.addEventListener("click", () => {
 els.btnCopy.addEventListener("click", async () => {
   try {
     await navigator.clipboard.writeText(editor.getValue());
-    els.status.textContent = "コードをコピーしました";
+    els.status.textContent = t("status.copied");
   } catch {
-    els.status.textContent = "コピーに失敗しました";
+    els.status.textContent = t("status.copyFailed");
   }
 });
 
@@ -260,24 +289,24 @@ els.btnSvg.addEventListener("click", () => {
   const svg = currentSvg();
   if (svg) {
     exportSvg(svg);
-    els.status.textContent = "SVG を保存しました";
+    els.status.textContent = t("status.svgSaved");
   } else {
-    els.status.textContent = "描画結果がありません";
+    els.status.textContent = t("status.noRender");
   }
 });
 
 els.btnPng.addEventListener("click", async () => {
   const svg = currentSvg();
   if (!svg) {
-    els.status.textContent = "描画結果がありません";
+    els.status.textContent = t("status.noRender");
     return;
   }
-  els.status.textContent = "PNG を生成中…";
+  els.status.textContent = t("status.pngGenerating");
   try {
     await exportPng(svg);
-    els.status.textContent = "PNG を保存しました";
+    els.status.textContent = t("status.pngSaved");
   } catch (e) {
-    els.status.textContent = e instanceof Error ? e.message : "PNG 生成に失敗";
+    els.status.textContent = e instanceof Error ? e.message : t("status.pngFailed");
   }
 });
 

@@ -15,3 +15,6 @@ dist/
 # Claude-local working docs (instructions / handoff memo; not for the repo)
 CLAUDE.md
 HANDOFF.md
+
+# Local-only design docs (brainstorm specs/plans; not for the public repo)
+docs/superpowers/
