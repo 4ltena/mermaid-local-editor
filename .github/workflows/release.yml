@@ -147,7 +147,7 @@ jobs:
               $0 ~ ("^## \\[" ver "\\]") { grab = 1; next }
               grab && /^## \[/ { exit }
               grab {
-                if ($0 ~ /^### (検証|Verified|セキュリティ|Security)/) { skip = 1; next }
+                if ($0 ~ /^### (検証|Verified|セキュリティ|Security|備考|Notes)/) { skip = 1; next }
                 if (skip) {
                   if ($0 ~ /^$/ || $0 ~ /^[[:space:]]/ || $0 ~ /^-/) next
                   skip = 0
