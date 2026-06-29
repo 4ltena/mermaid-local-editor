@@ -23,6 +23,8 @@ export default defineConfig({
     build: {
       outDir: "out/renderer",
       target: "es2021",
+      // mermaid のダイアグラムチャンクは大きい。バンドル前提なので警告閾値を上げる。
+      chunkSizeWarningLimit: 3000,
       rollupOptions: { input: resolve(__dirname, "index.html") },
     },
   },
