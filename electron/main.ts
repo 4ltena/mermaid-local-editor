@@ -37,7 +37,8 @@ app.whenReady().then(() => {
   if (!isDev) applyProductionCsp();
   handleAppProtocol();
   setupDownloads();
-  buildMenu(isDev);
+  const menuLocale = /^ja/i.test(app.getLocale()) ? "ja" : "en";
+  buildMenu(isDev, menuLocale);
   createWindow();
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
