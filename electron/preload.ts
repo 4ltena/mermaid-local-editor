@@ -14,6 +14,7 @@ contextBridge.exposeInMainWorld("api", {
   getStartupPath: () => ipcRenderer.invoke("startup:path"),
   setTitle: (title: string) => ipcRenderer.send("window:title", title),
   allowClose: () => ipcRenderer.send("allow-close"),
-  onCommand: (cb: (payload: CommandPayload) => void) =>
-    ipcRenderer.on("command", (_e, payload: CommandPayload) => cb(payload)),
+  onCommand: (cb: (payload: CommandPayload) => void) => {
+    ipcRenderer.on("command", (_e, payload: CommandPayload) => cb(payload));
+  },
 });
