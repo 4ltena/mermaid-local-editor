@@ -10,6 +10,7 @@ import { exportDiagram, lockedCounterpart } from "./export";
 import { SAMPLES, DEFAULT_CODE } from "./samples";
 import { detectInitialLocale, applyDom, getLocale, setLocale, t, LOCALES } from "./i18n";
 import type { Locale } from "./i18n";
+import { DocumentManager, type DocHost } from "./document";
 
 // ---------- persisted state ----------
 const LS = {
@@ -17,6 +18,7 @@ const LS = {
   theme: "mle.theme",
   ui: "mle.uiTheme",
   split: "mle.split",
+  docPath: "mle.docPath",
 };
 
 const $ = <T extends HTMLElement = HTMLElement>(id: string): T => {
@@ -228,13 +230,18 @@ function scheduleRender(code: string): void {
   }, 280);
 }
 
+let doc: DocumentManager;
+
 const initialCode = localStorage.getItem(LS.code) ?? DEFAULT_CODE;
 
 const editor = new CodeEditor({
   parent: els.editor,
   initialDoc: initialCode,
   dark: uiDark,
-  onChange: scheduleRender,
+  onChange: (code) => {
+    scheduleRender(code);
+    doc.onEdit();
+  },
 });
 
 // ---------- samples ----------
@@ -567,6 +574,54 @@ window.addEventListener("keydown", (e) => {
   }
 });
 
-// ---------- initial render ----------
-void render(initialCode, true);
+// ---------- document / file management ----------
+const host: DocHost = {
+  getEditorContent: () => editor.getValue(),
+  applyContent: (text) => {
+    loadingSample = true;
+    editor.setValue(text);
+    loadingSample = false;
+    els.sampleSelect.value = "";
+    void render(text, true);
+  },
+  setStatus,
+  persist: (code, path) => {
+    localStorage.setItem(LS.code, code);
+    if (path) localStorage.setItem(LS.docPath, path);
+    else localStorage.removeItem(LS.docPath);
+  },
+  loadDraft: () => ({
+    code: localStorage.getItem(LS.code),
+    path: localStorage.getItem(LS.docPath),
+  }),
+  t,
+  defaultContent: DEFAULT_CODE,
+};
+
+doc = new DocumentManager(window.api, host);
+
+window.api.onCommand((payload) => {
+  switch (payload.type) {
+    case "new":
+      void doc.newDoc();
+      break;
+    case "open":
+      void doc.open();
+      break;
+    case "save":
+      void doc.save();
+      break;
+    case "save-as":
+      void doc.saveAs();
+      break;
+    case "open-recent":
+      if (payload.path) void doc.openRecent(payload.path);
+      break;
+    case "close-request":
+      void doc.handleCloseRequest(() => window.api.allowClose());
+      break;
+  }
+});
+
+void doc.init();
 editor.focus();
