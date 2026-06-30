@@ -2,7 +2,9 @@ import { describe, it, expect } from "vitest";
 import { join } from "node:path";
 import { resolveRendererPath } from "../electron/path-resolver";
 
-const root = "/app/out/renderer";
+// Build the root with the OS-native separator so the traversal check (which
+// compares against `path.sep`) matches on both POSIX and Windows.
+const root = join("/app", "out", "renderer");
 
 describe("resolveRendererPath", () => {
   it("maps the root request to index.html", () => {

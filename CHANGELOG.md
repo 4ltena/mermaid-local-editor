@@ -3,6 +3,28 @@
 [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/) 形式に概ね従い、[セマンティックバージョニング](https://semver.org/lang/ja/) を採用しています。
 This file roughly follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and uses [Semantic Versioning](https://semver.org/).
 
+## [0.5.1] — 2026-06-30
+
+軽微な UX 修正と、CI 依存・テストの整備。
+
+### 修正
+- 言語を切り替えたとき、ウィンドウタイトルの「無題」表示が選択した言語に追従するようにした。
+- ファイルを開いた直後にステータスが「描画完了」で上書きされ、「開きました」が見えなかった問題を修正。
+
+### 備考
+- GitHub Actions の依存を更新（actions/checkout 7・setup-node 6・upload-artifact 7・download-artifact 8、softprops/action-gh-release 3）。
+- `path-resolver` のユニットテストをクロスプラットフォーム化し、Windows でも通過するようにした。
+
+A small UX fix plus CI dependency and test housekeeping.
+
+### Fixed
+- The window title's "Untitled" label now follows the selected UI language when switching languages.
+- Fixed the file-open status being immediately overwritten by "Rendered", so "Opened" now stays visible.
+
+### Notes
+- Updated GitHub Actions dependencies (actions/checkout 7, setup-node 6, upload-artifact 7, download-artifact 8, softprops/action-gh-release 3).
+- Made the `path-resolver` unit tests cross-platform so they pass on Windows.
+
 ## [0.5.0] — 2026-06-30
 
 ローカル `.mmd` ファイルの読み書きに対応。

@@ -22,7 +22,7 @@ function makeHost(initial = DEFAULT): DocHost {
   let content = initial;
   return {
     getEditorContent: () => content,
-    applyContent: (t) => {
+    applyContent: async (t) => {
       content = t;
     },
     setStatus: vi.fn(),
