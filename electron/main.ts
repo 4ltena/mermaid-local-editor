@@ -38,6 +38,7 @@ function createWindow(): void {
     void win.loadURL("app://app/index.html");
   }
 
+  forceClose = false;
   win.on("close", (e) => {
     if (forceClose) return;
     e.preventDefault();
