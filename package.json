@@ -1,7 +1,7 @@
 {
   "name": "mermaid-local-editor",
   "private": true,
-  "version": "0.4.1",
+  "version": "0.5.0",
   "license": "Apache-2.0",
   "type": "module",
   "main": "out/main/index.js",
@@ -26,7 +26,7 @@
     "@codemirror/view": "^6.36.1",
     "@types/node": "^22.10.0",
     "codemirror": "^6.0.1",
-    "electron": "^33.2.0",
+    "electron": "^33.4.11",
     "electron-builder": "^25.1.8",
     "electron-vite": "^5.0.0",
     "mermaid": "^11.4.1",

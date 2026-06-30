@@ -1,11 +1,17 @@
 import { join } from "node:path";
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
+import { setupFiles, approvePaths } from "./files";
+import { loadState, saveState, addRecent, type AppState } from "./recent";
 import { registerAppScheme, handleAppProtocol } from "./protocol";
 import { applyProductionCsp } from "./security";
 import { buildMenu } from "./menu";
 import { setupDownloads } from "./downloads";
 
 const isDev = !app.isPackaged;
+const RECENT_MAX = 10;
+let appState: AppState = { recent: [], lastPath: null };
+let menuLocale = "en";
+let forceClose = false;
 
 registerAppScheme();
 
@@ -31,14 +37,27 @@ function createWindow(): void {
   } else {
     void win.loadURL("app://app/index.html");
   }
+
+  forceClose = false;
+  win.on("close", (e) => {
+    if (forceClose) return;
+    e.preventDefault();
+    win.webContents.send("command", { type: "close-request" });
+  });
 }
 
 app.whenReady().then(() => {
   if (!isDev) applyProductionCsp();
   handleAppProtocol();
   setupDownloads();
+  setupFiles();
+  appState = loadState();
+  // Approve persisted user-chosen paths so the renderer may reopen them
+  // (the file IPC rejects any path the user has not explicitly chosen).
+  approvePaths([...appState.recent, ...(appState.lastPath ? [appState.lastPath] : [])]);
+
   const ol = app.getLocale().toLowerCase();
-  const menuLocale = ol.startsWith("zh")
+  menuLocale = ol.startsWith("zh")
     ? /tw|hant|hk|mo/.test(ol)
       ? "zh-TW"
       : "zh-CN"
@@ -59,7 +78,38 @@ app.whenReady().then(() => {
                   : ol.startsWith("ru")
                     ? "ru"
                     : "en";
-  buildMenu(isDev, menuLocale);
+  buildMenu(isDev, menuLocale, appState.recent);
+
+  ipcMain.handle("startup:path", () => appState.lastPath);
+
+  ipcMain.on("doc:active", (_e, payload: { path: string | null; addToRecent: boolean }) => {
+    appState.lastPath = payload.path;
+    if (payload.addToRecent && payload.path) {
+      appState.recent = addRecent(appState.recent, payload.path, RECENT_MAX);
+      app.addRecentDocument(payload.path);
+      buildMenu(isDev, menuLocale, appState.recent);
+    }
+    saveState(appState);
+  });
+
+  ipcMain.on("window:title", (e, title: string) => {
+    BrowserWindow.fromWebContents(e.sender)?.setTitle(title);
+  });
+
+  ipcMain.on("recent:remove", (_e, path: string) => {
+    appState.recent = appState.recent.filter((p) => p !== path);
+    if (appState.lastPath === path) appState.lastPath = null;
+    buildMenu(isDev, menuLocale, appState.recent);
+    saveState(appState);
+  });
+
+  ipcMain.on("allow-close", (e) => {
+    forceClose = true;
+    const win = BrowserWindow.fromWebContents(e.sender) ?? BrowserWindow.getAllWindows()[0];
+    if (win) win.close();
+    else app.quit();
+  });
+
   createWindow();
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();

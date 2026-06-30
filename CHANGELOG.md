@@ -3,6 +3,34 @@
 [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/) 形式に概ね従い、[セマンティックバージョニング](https://semver.org/lang/ja/) を採用しています。
 This file roughly follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and uses [Semantic Versioning](https://semver.org/).
 
+## [0.5.0] — 2026-06-30
+
+ローカル `.mmd` ファイルの読み書きに対応。
+
+### 追加
+- ファイルの新規作成・開く・保存・名前を付けて保存（`Ctrl/Cmd+N`/`O`/`S`/`Shift+S`）。File メニューと、最近使った項目を開くサブメニュー。
+- 未保存のまま新規・開く・終了しようとすると確認ダイアログ（保存／破棄／キャンセル）を表示。タイトルバーにファイル名と未保存マーク（`*`）。
+- 起動時に前回開いていたファイルを再オープン。前回の終了時に未保存だった編集内容を復元。
+
+### セキュリティ
+- ファイル読み書きの IPC を、ダイアログや最近使った項目でユーザーが明示的に選んだパスだけに制限。
+
+### 検証
+- 型検査・本番ビルドが成功。本機能のユニットテスト（recent / document）も成功。
+
+Local `.mmd` file read/write support.
+
+### Added
+- New / Open / Save / Save As (`Ctrl/Cmd+N`/`O`/`S`/`Shift+S`), a File menu, and an Open Recent submenu.
+- A confirmation dialog (Save / Don't Save / Cancel) when creating, opening, or quitting with unsaved changes; the title bar shows the file name and an unsaved marker (`*`).
+- Reopens the last file on startup and restores unsaved edits from the previous session.
+
+### Security
+- Restricted the file read/write IPC to paths the user explicitly chose via a dialog or the recent-files list.
+
+### Verified
+- Type-check and the production build pass; the feature's unit tests (recent / document) pass.
+
 ## [0.4.1] — 2026-06-29
 
 UI の微調整と、言語切替の不具合修正。
