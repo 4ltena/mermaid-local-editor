@@ -19,7 +19,7 @@ export interface FileBridge {
 
 export interface DocHost {
   getEditorContent(): string;
-  applyContent(text: string): void;
+  applyContent(text: string): Promise<void>;
   setStatus(key: string): void;
   persist(code: string, path: string | null): void;
   loadDraft(): { code: string | null; path: string | null };
@@ -54,7 +54,7 @@ export class DocumentManager {
         this.baseline = res.content;
         const recovered =
           draft.code != null && draft.path === diskPath && draft.code !== res.content;
-        this.host.applyContent(recovered ? draft.code! : res.content);
+        await this.host.applyContent(recovered ? draft.code! : res.content);
         this.bridge.setActiveDoc(diskPath, false);
         this.refresh();
         return;
@@ -64,7 +64,7 @@ export class DocumentManager {
     }
     this.path = null;
     this.baseline = this.host.defaultContent;
-    this.host.applyContent(draft.code ?? this.host.defaultContent);
+    await this.host.applyContent(draft.code ?? this.host.defaultContent);
     this.bridge.setActiveDoc(null, false);
     this.refresh();
   }
@@ -77,6 +77,12 @@ export class DocumentManager {
 
   isDirty(): boolean {
     return this.host.getEditorContent() !== this.baseline;
+  }
+
+  /** Re-emit the window title (e.g. after the UI language changes, so the
+   *  "Untitled" label is shown in the new locale). */
+  refreshTitle(): void {
+    this.updateTitle();
   }
 
   private docName(): string {
@@ -110,7 +116,7 @@ export class DocumentManager {
     if (!(await this.guard())) return;
     this.path = null;
     this.baseline = this.host.defaultContent;
-    this.host.applyContent(this.host.defaultContent);
+    await this.host.applyContent(this.host.defaultContent);
     this.bridge.setActiveDoc(null, false);
     this.refresh();
   }
@@ -136,7 +142,9 @@ export class DocumentManager {
     }
     this.path = p;
     this.baseline = res.content;
-    this.host.applyContent(res.content);
+    // Await the render so the "opened" status isn't immediately overwritten by
+    // the render's own "rendered" status.
+    await this.host.applyContent(res.content);
     this.bridge.setActiveDoc(p, true);
     this.refresh();
     this.host.setStatus("status.opened");

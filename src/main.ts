@@ -309,6 +309,7 @@ function buildLangMenu(): void {
       relabelSamples();
       updateLangButton();
       if (lastStatusKey) els.status.textContent = t(lastStatusKey);
+      doc.refreshTitle();
       closeLangMenu();
     });
     els.langMenu.appendChild(li);
@@ -582,7 +583,7 @@ const host: DocHost = {
     editor.setValue(text);
     loadingSample = false;
     els.sampleSelect.value = "";
-    void render(text, true);
+    return render(text, true);
   },
   setStatus,
   persist: (code, path) => {
