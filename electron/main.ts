@@ -96,9 +96,16 @@ app.whenReady().then(() => {
     BrowserWindow.fromWebContents(e.sender)?.setTitle(title);
   });
 
-  ipcMain.on("allow-close", () => {
+  ipcMain.on("recent:remove", (_e, path: string) => {
+    appState.recent = appState.recent.filter((p) => p !== path);
+    if (appState.lastPath === path) appState.lastPath = null;
+    buildMenu(isDev, menuLocale, appState.recent);
+    saveState(appState);
+  });
+
+  ipcMain.on("allow-close", (e) => {
     forceClose = true;
-    const win = BrowserWindow.getAllWindows()[0];
+    const win = BrowserWindow.fromWebContents(e.sender) ?? BrowserWindow.getAllWindows()[0];
     if (win) win.close();
     else app.quit();
   });

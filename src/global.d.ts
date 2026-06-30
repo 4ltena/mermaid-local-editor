@@ -12,6 +12,7 @@ declare global {
         labels: ConfirmLabels,
       ): Promise<"save" | "discard" | "cancel">;
       setActiveDoc(path: string | null, addToRecent: boolean): void;
+      removeRecent(path: string): void;
       getStartupPath(): Promise<string | null>;
       setTitle(title: string): void;
       allowClose(): void;

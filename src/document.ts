@@ -12,6 +12,7 @@ export interface FileBridge {
   writeFile(path: string, content: string): Promise<{ ok: true } | { error: string }>;
   confirmUnsaved(filename: string, labels: ConfirmLabels): Promise<"save" | "discard" | "cancel">;
   setActiveDoc(path: string | null, addToRecent: boolean): void;
+  removeRecent(path: string): void;
   getStartupPath(): Promise<string | null>;
   setTitle(title: string): void;
 }
@@ -58,6 +59,7 @@ export class DocumentManager {
         this.refresh();
         return;
       }
+      this.bridge.removeRecent(diskPath);
       this.host.setStatus("status.openFailed");
     }
     this.path = null;
@@ -128,6 +130,7 @@ export class DocumentManager {
   private async loadPath(p: string): Promise<void> {
     const res = await this.bridge.readFile(p);
     if ("error" in res) {
+      this.bridge.removeRecent(p);
       this.host.setStatus("status.openFailed");
       return;
     }

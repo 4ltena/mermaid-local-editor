@@ -20,7 +20,7 @@ export function loadState(): AppState {
   try {
     const raw = JSON.parse(readFileSync(statePath(), "utf8")) as Partial<AppState>;
     return {
-      recent: Array.isArray(raw.recent) ? raw.recent : [],
+      recent: Array.isArray(raw.recent) ? raw.recent.filter((p) => typeof p === "string") : [],
       lastPath: typeof raw.lastPath === "string" ? raw.lastPath : null,
     };
   } catch {

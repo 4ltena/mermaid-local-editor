@@ -11,6 +11,7 @@ function makeBridge(over: Partial<FileBridge> = {}): FileBridge {
     writeFile: vi.fn(async () => ({ ok: true as const })),
     confirmUnsaved: vi.fn(async () => "discard" as const),
     setActiveDoc: vi.fn(),
+    removeRecent: vi.fn(),
     getStartupPath: vi.fn(async () => null),
     setTitle: vi.fn(),
     ...over,
@@ -45,12 +46,13 @@ describe("DocumentManager", () => {
       showOpenDialog: vi.fn(async () => "/d/x.mmd"),
       readFile: vi.fn(async () => ({ content: "flowchart LR" })),
     });
-    const host = makeHost();
+    const host = makeHost("");
     const doc = new DocumentManager(bridge, host);
     await doc.open();
     expect(host.getEditorContent()).toBe("flowchart LR");
     expect(doc.isDirty()).toBe(false);
     expect(bridge.setActiveDoc).toHaveBeenCalledWith("/d/x.mmd", true);
+    expect(bridge.confirmUnsaved).not.toHaveBeenCalled();
   });
 
   it("save on an untitled doc falls back to saveAs", async () => {

@@ -11,6 +11,7 @@ contextBridge.exposeInMainWorld("api", {
     ipcRenderer.invoke("dialog:confirm-unsaved", filename, labels),
   setActiveDoc: (path: string | null, addToRecent: boolean) =>
     ipcRenderer.send("doc:active", { path, addToRecent }),
+  removeRecent: (path: string) => ipcRenderer.send("recent:remove", path),
   getStartupPath: () => ipcRenderer.invoke("startup:path"),
   setTitle: (title: string) => ipcRenderer.send("window:title", title),
   allowClose: () => ipcRenderer.send("allow-close"),
